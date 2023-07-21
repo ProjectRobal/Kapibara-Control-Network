@@ -19,10 +19,21 @@ class Neuron:
         # evaluation of neuron used for crossover and mutation 
         self.evaluation:float=0.0
 
+    def input_size(self)->int:
+        return len(self.input_weights)
+
+    def output_size(self)->int:
+        return len(self.output_weights)
+
     def reset(self):
 
         self.past_state=self.state
         self.state=0.0
+        self.evaluation=0.0
+
+    def clear(self):
+        self.state=0.0
+        self.past_state=0.0
         self.evaluation=0.0
 
     def setEvaluation(self,eval:float):

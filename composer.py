@@ -28,6 +28,30 @@
 
 '''
 
+'''
+
+To do:
+Dot product function
+Crossover function
+Mutation (Guasian mutation)
+
+Layer class
+Network class
+Species class, sort networks base on structure
+
+Neuron,Networks,Composer saving/loading
+Composer loop and evaluation
+
+'''
+
+from base.dotproduct import Product
+from base.mutation import Mutation
+from base.crossover import Crossover
+
+from dotproducts.dotnumpy import NumpyDotProduct
+from mutation.gaussmutation import GaussMutaion
+from crossover.flip import FlipCross
+
 def check_kwargs(name:str,default,**kwargs):
     if name in kwargs.keys():
         return kwargs[name]
@@ -63,9 +87,21 @@ class Composer:
         # an amount of steps each network will perform in environemt
         self.step_time:int=check_kwargs("step_time",20,kwargs)
 
+        self.dot_product:Product=NumpyDotProduct
 
+        self.mutation:Mutation=GaussMutaion
 
+        self.crossover:Crossover=FlipCross
 
+    def setDotProductMethod(self,dot_prod:Product):
+        self.dot_product=dot_prod
+
+    def setMutationMethod(self,mutation:Mutation):
+        self.mutation=mutation
+
+    def setCrossoverMethod(self,crossover:Crossover):
+        self.crossover=crossover
+    
     
     def PrepareNeuronPopulation(self):
         pass
