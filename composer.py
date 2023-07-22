@@ -44,13 +44,19 @@ Composer loop and evaluation
 
 '''
 
+import numpy as np
+
 from base.dotproduct import Product
 from base.mutation import Mutation
 from base.crossover import Crossover
 
 from dotproducts.dotnumpy import NumpyDotProduct
 from mutation.gaussmutation import GaussMutaion
-from crossover.flip import FlipCross
+from crossover.onepoint import OnePoint
+
+from neuron import Neuron
+from network import Network
+from specie import Specie
 
 def check_kwargs(name:str,default,**kwargs):
     if name in kwargs.keys():
@@ -91,7 +97,11 @@ class Composer:
 
         self.mutation:Mutation=GaussMutaion
 
-        self.crossover:Crossover=FlipCross
+        self.crossover:Crossover=OnePoint
+
+        self.PrepareNeuronPopulation()
+
+        self.PrepareNetworkPopulation()
 
     def setDotProductMethod(self,dot_prod:Product):
         self.dot_product=dot_prod
@@ -101,13 +111,27 @@ class Composer:
 
     def setCrossoverMethod(self,crossover:Crossover):
         self.crossover=crossover
-    
+
+    def CreateNetwork(self)->Network:
+        if self.init_theta==0:
+            theta=int(np.random.random()*self.max_theta)
+        else:
+            theta=self.init_theta
+
+        if self.init_tau==0:
+            tau=int(np.random.random()*self.max_tau)
+        else:
+            tau=self.init_tau
+
+        return Network(self.network_input_size,self.network_output_size,theta,tau)
     
     def PrepareNeuronPopulation(self):
-        pass
+        self.neurons:list[Neuron]=[Neuron(self.network_input_size,self.network_output_size,self.dot_product)]*self.neuron_population_size
 
     def PrepareNetworkPopulation(self):
-        pass
+        self.species:list[Specie]=[Specie()]
+
+        self.species[0].Append(self.CreateNetwork())
 
 
 

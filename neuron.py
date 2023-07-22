@@ -1,7 +1,10 @@
 import numpy as np
+from base.dotproduct import Product
+from dotproducts.dotnumpy import NumpyDotProduct
+
 
 class Neuron:
-    def __init__(self,input_size:int,output_size:int):
+    def __init__(self,input_size:int,output_size:int,dot_product:Product=NumpyDotProduct):
         '''
         input_size - a size of input weights
         output_size - a size of output weights
@@ -15,9 +18,16 @@ class Neuron:
         self.output_weights=np.random.random(output_size)
         self.state:float=0.0
         self.past_state:float=0.0
+        self.dot_product=dot_product
 
         # evaluation of neuron used for crossover and mutation 
         self.evaluation:float=0.0
+
+    def fire(self,inputs:np.array)->np.array:
+        self.state=self.dot_product.compute(self.input_weights,[*inputs,self.past_state])
+
+        return self.state*self.output_weights
+
 
     def input_size(self)->int:
         return len(self.input_weights)

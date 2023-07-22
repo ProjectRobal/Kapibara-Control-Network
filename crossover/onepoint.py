@@ -4,7 +4,7 @@ import neuron
 import network
 from base.crossover import Crossover
 
-class FlipCross(Crossover):
+class OnePoint(Crossover):
     '''
         A base class for implementing crossover method for neurons and networks.
         So each function has NotImplementedError.

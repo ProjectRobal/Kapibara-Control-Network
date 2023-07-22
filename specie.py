@@ -4,6 +4,12 @@
 
 from network import Network
 
+'''
+ You can also use function to calculate similarity factor, then store (factor,network) in dictionary,
+sort it and slpit them.
+
+'''
+
 class Specie:
     '''
         A class that store objects with similar traits.
@@ -15,7 +21,12 @@ class Specie:
         self.objects:list[Network]=[]
 
     def doMatch(self,network:Network)->bool:
-        pass
+        theta=network.theta
+        tau=network.tau
+        
+
+    def Append(self,network:Network):
+        self.objects.append(network)
 
     def addIfMatch(self,network:Network)->bool:
         '''
