@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.ma as ma
 from base.dotproduct import Product
 from dotproducts.dotnumpy import NumpyDotProduct
 from base.activation import Activation
@@ -24,8 +25,23 @@ class Neuron:
         # evaluation of neuron used for crossover and mutation 
         self.evaluation:float=0.0
 
-    def fire(self,inputs:np.array)->float:
-        self.state=self.activation(self.dot_product(self.input_weights,[*inputs,self.past_state]))
+    @staticmethod
+    def numpy_filter(x:np.ndarray,mask:list[int])->np.ndarray:
+        output:list[int]=[]
+
+        for m in mask:
+            output.append(x[m])
+
+        return np.array(output)
+
+    def fire(self,inputs:np.array,mask:list[int]=[])->float:
+
+        if len(mask)!=0:
+            masked_array=self.numpy_filter(self.input_weights,[*mask,len(self.input_weights)-1])
+        else:
+            masked_array=self.input_weights
+
+        self.state=self.activation(self.dot_product(masked_array,[*inputs,self.past_state]))
         self.past_state=self.state
 
         return self.state

@@ -7,15 +7,13 @@ import activation
 import timeit
 
 
-neurons:list[neuron.Neuron]=[neuron.Neuron(4,activation=activation.relu.Relu)]*256
+neurons:list[neuron.Neuron]=[neuron.Neuron(32,activation=activation.relu.Relu)]*256
 
-network=network.Network(4,1,32)
+network=network.Network(4,1,1,32)
 
 input=np.random.random(4)
 
 print("Inputs:",input)
-
-network.addOutputNode([activation.relu.Relu,activation.relu.Relu,activation.relu.Relu])
 
 network.Batch(neurons)
 

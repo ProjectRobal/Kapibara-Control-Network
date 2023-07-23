@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.ma as ma
 import random
 
 from base.activation import Activation
@@ -11,13 +12,26 @@ class Layer:
     '''
         A class that defines hidden layer of network
         it has a list with references for each neuron.
+        Layer has mask used when number of inputs isn't equal to neuron weight size thanks to
+        that it only used couple of neurons.
     '''
-    def __init__(self,input_size:int,batch_size:int):
+    def __init__(self,input_size:int,batch_size:int,max_synaps_size:int):
         '''
             input_size - a layer input size
             batch_size - a number of neurons utilized by layer
         '''
         self.input_size=input_size
+        self.mask=[0]*input_size
+
+        choose_mask=random.sample(range(max_synaps_size),input_size)
+
+        i:int=0
+        for choosen in choose_mask:
+            self.mask[i]=choosen
+            i+=1
+
+        print(self.mask)
+
         self.neuron_batch_size=batch_size
         self.neuron_batch=[]
 
@@ -39,7 +53,7 @@ class Layer:
 
         for neur in self.neuron_batch:
             
-            output[i]=neur.fire(inputs)
+            output[i]=neur.fire(inputs,self.mask)
             i+=1
 
         return output
@@ -65,7 +79,7 @@ class Network:
         And information of number of layers and total count of neurons.
         Each layer will have neuron count equal to tau.
     '''
-    def __init__(self,input_size:int,theta:int,tau:int,dotproduct:Product=NumpyDotProduct):
+    def __init__(self,input_size:int,output_size:int,theta:int,tau:int,dotproduct:Product=NumpyDotProduct):
         '''
             theta - number of layers
             tau - number of neuron population
@@ -73,6 +87,7 @@ class Network:
         self.dot_product=dotproduct
 
         self.input_size=input_size
+
         self.theta=theta
         self.tau=tau
 
@@ -81,34 +96,43 @@ class Network:
         if self.tau<=0:
             self.tau=1
 
-        # for now we use only one leayer
+        # for now we use only one layer
         self.theta=1
 
-        # Q estimation output
-        self.outpu_layer:list[neuron.OutputNeuron]=[neuron.OutputNeuron(Linear)]
-        
         self.InitializeLayers()
+
+        self.layers.append(Layer(self.tau,output_size+1,tau))
+
+        self.output_activation_function:list[Activation]=[Linear]*(output_size+1)
 
     def InitializeLayers(self):
         '''
          For now we will use only one layer for simplicity
         '''
-        self.layers:list[Layer]=[Layer(self.input_size,self.tau)]*self.theta
+        self.layers:list[Layer]=[Layer(self.input_size,self.tau,self.tau)]
 
-    def addOutputNode(self,activation:Activation|list[Activation]):
+        for i in range(self.theta-1):
+            self.layers.append(Layer(self.tau,self.tau,self.tau))
 
-        if type(activation) is list:
-            for activ in activation:
-                self.outpu_layer.append(neuron.OutputNeuron(activ))
+    def setActivationFunction(self,id:int,activation:Activation):
+        if id>=len(self.output_activation_function):
             return
         
-        self.outpu_layer.append(neuron.OutputNeuron(activation))
+        self.output_activation_function[id]=activation
+
+    def getNeuronCount(self)->int:
+        output:int=0
+
+        for layer in self.layers:
+            output+=layer.neuron_batch_size
+
+        return output
 
     def Batch(self,population:list[neuron.Neuron])->list[neuron.Neuron]:
         '''
             Take a batches from population and put them into layers.
         '''
-        neuron_pool:list[neuron.Neuron]=random.sample(population,self.tau)
+        neuron_pool:list[neuron.Neuron]=random.sample(population,self.getNeuronCount())
 
         for layer in self.layers:
             taken:list[neuron.Neuron]=layer.batch(neuron_pool)
@@ -122,15 +146,7 @@ class Network:
         for layer in self.layers:
             layer_out:np.ndarray=layer.forward(layer_out)
 
-
-        output:np.ndarray=np.zeros(len(self.outpu_layer),dtype=np.float32)
-        i:int=0
-
-        for out_neuron in self.outpu_layer:
-            output[i]=out_neuron.fire(layer_out)
-            i+=1
-
-        return output
+        return layer_out
 
     def Shape(self)->tuple[int,int]:
         return (self.theta,self.tau*self.theta)
