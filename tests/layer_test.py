@@ -9,7 +9,7 @@ import timeit
 
 neurons:list[neuron.Neuron]=[neuron.Neuron(4,activation=activation.relu.Relu)]*256
 
-layer1=network.Layer(4,64)
+layer1=network.Layer(4,32)
 
 layer1.batch(neurons)
 
