@@ -1,21 +1,56 @@
 import numpy as np
+import random
 
 import neuron
-from specie import Specie
 
 class Layer:
     '''
         A class that defines hidden layer of network
         it has a list with references for each neuron.
     '''
-    def __init__(self,input_size:int,output_size:int):
-        self.neuron_batch_size=output_size
+    def __init__(self,input_size:int,batch_size:int):
+        '''
+            input_size - a layer input size
+            batch_size - a number of neurons utilized by layer
+        '''
+        self.input_size=input_size
+        self.neuron_batch_size=batch_size
+        self.neuron_batch=[]
+
+    def batch(self,neurons:list[neuron.Neuron]):
+        '''
+            Sample random neurons into layer
+        '''
+        self.neuron_batch=random.sample(neurons,self.neuron_batch_size)
+
+    def forward(self,inputs:np.array)->np.ndarray:
+        '''
+            A function that calculate output of layer, based 
+            on inputs
+        '''
+        output=np.ndarray(self.neuron_batch_size,dtype=np.float32)
+        i:int=0
+
+        for neur in self.neuron_batch:
+            
+            output[i]=neur.fire(inputs)
+            i+=1
+
+        return output
+
+    def backward(self,evaluation:float):
+        '''
+            Function that pass evaluation value to each neurons evenly
+        '''
+        eval:float=evaluation/self.neuron_batch_size
+
+        for neuron in self.neuron_bacth:
+            neuron.applyEvaluation(eval)
+
 
     def size(self)->int:
         return self.neuron_batch_size
     
-
-
 
 class Network:
     '''

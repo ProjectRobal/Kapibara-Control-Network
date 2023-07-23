@@ -1,13 +1,15 @@
 import numpy as np
 from base.dotproduct import Product
 from dotproducts.dotnumpy import NumpyDotProduct
+from base.activation import Activation
+from activation.linear import Linear
 
 
 class Neuron:
-    def __init__(self,input_size:int,dot_product:Product=NumpyDotProduct):
+    def __init__(self,input_size:int,activation:Activation=Linear,dot_product:Product=NumpyDotProduct):
         '''
         input_size - a size of input weights
-        
+
         state - a current state of a network
         past_state - a past state used in recurrent calculation
         '''
@@ -17,12 +19,13 @@ class Neuron:
         self.state:float=0.0
         self.past_state:float=0.0
         self.dot_product=dot_product
+        self.activation=activation
 
         # evaluation of neuron used for crossover and mutation 
         self.evaluation:float=0.0
 
-    def fire(self,inputs:np.array)->np.array:
-        self.state=self.dot_product.compute(self.input_weights,[*inputs,self.past_state])
+    def fire(self,inputs:np.array)->float:
+        self.state=self.activation(self.dot_product(self.input_weights,[*inputs,self.past_state]))
         self.past_state=self.state
 
         return self.state
@@ -44,6 +47,9 @@ class Neuron:
 
     def setEvaluation(self,eval:float):
         self.evaluation=eval
+
+    def applyEvaluation(self,eval:float):
+        self.evaluation+=eval
 
     def getEvaluation(self)->float:
         return self.evaluation

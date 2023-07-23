@@ -2,13 +2,10 @@
     A base class for activation function for neurons.
 '''
 
-from typing import Any
-
-
 class Activation:
     @staticmethod
     def activate(x:float)->float:
-        raise NotImplementedError()
+        raise NotImplementedError()        
     
-    def __call__(self, x:float) -> float:
-        return self.activate(x)
+    def __new__(cls, x:float) -> float:
+        return cls.activate(x)

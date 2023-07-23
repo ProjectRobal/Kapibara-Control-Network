@@ -3,6 +3,7 @@
 
 '''
 
+from typing import Any
 import neuron
 import network
 
@@ -19,3 +20,6 @@ class Crossover:
     @staticmethod
     def CrossNetworks(network1:network.Network,network2:network.Network)->network.Network:
         raise NotImplementedError()
+    
+    def __new__(cls, neuron1:neuron.Neuron,neuron2:neuron.Neuron) -> neuron.Neuron:
+        return cls.CrossNeurons(neuron1,neuron2)

@@ -3,6 +3,7 @@
 
 '''
 
+from typing import Any
 import neuron
 import network
 
@@ -19,3 +20,6 @@ class Mutation:
     @staticmethod
     def MutateNetwork(network:network.Network)->network.Network:
         raise NotImplementedError()
+    
+    def __new__(cls, neuron:neuron.Neuron) -> neuron.Neuron:
+        return cls.MutateNeuron(neuron)

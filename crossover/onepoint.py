@@ -23,8 +23,8 @@ class OnePoint(Crossover):
     def CrossNeurons(neuron1:neuron.Neuron,neuron2:neuron.Neuron)->neuron.Neuron:
         out=neuron.Neuron(neuron1.input_size(),neuron1.output_size())
 
-        out.input_weights=Flip.cross_numpy(neuron1.input_weights,neuron2.input_weights)
-        out.output_weights=Flip.cross_numpy(neuron1.output_weights,neuron2.output_weights)
+        out.input_weights=OnePoint.cross_numpy(neuron1.input_weights,neuron2.input_weights)
+        out.output_weights=OnePoint.cross_numpy(neuron1.output_weights,neuron2.output_weights)
 
         return out
     
