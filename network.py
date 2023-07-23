@@ -50,7 +50,7 @@ class Layer:
         '''
         eval:float=evaluation/self.neuron_batch_size
 
-        for neuron in self.neuron_bacth:
+        for neuron in self.neuron_batch:
             neuron.applyEvaluation(eval)
 
 
@@ -65,7 +65,7 @@ class Network:
         And information of number of layers and total count of neurons.
         Each layer will have neuron count equal to tau.
     '''
-    def __init__(self,input_size:int,output_size:int,theta:int,tau:int,dotproduct:Product=NumpyDotProduct):
+    def __init__(self,input_size:int,theta:int,tau:int,dotproduct:Product=NumpyDotProduct):
         '''
             theta - number of layers
             tau - number of neuron population
@@ -73,9 +73,8 @@ class Network:
         self.dot_product=dotproduct
 
         self.input_size=input_size
-        self.output_size=output_size
         self.theta=theta
-        self.tau=self.tau
+        self.tau=tau
 
         if self.theta<=0:
             self.theta=1
@@ -86,7 +85,7 @@ class Network:
         self.theta=1
 
         # Q estimation output
-        self.outpu_layer:list[neuron.Neuron]=[neuron.Neuron(self.tau,Linear,dotproduct)]
+        self.outpu_layer:list[neuron.OutputNeuron]=[neuron.OutputNeuron(Linear)]
         
         self.InitializeLayers()
 
@@ -96,9 +95,14 @@ class Network:
         '''
         self.layers:list[Layer]=[Layer(self.input_size,self.tau)]*self.theta
 
-    def addOutputNode(self,activation:Activation):
+    def addOutputNode(self,activation:Activation|list[Activation]):
+
+        if type(activation) is list:
+            for activ in activation:
+                self.outpu_layer.append(neuron.OutputNeuron(activ))
+            return
         
-        self.outpu_layer.append(neuron.Neuron(self.layers[-1].neuron_batch_size,activation,self.dot_product))
+        self.outpu_layer.append(neuron.OutputNeuron(activation))
 
     def Batch(self,population:list[neuron.Neuron])->list[neuron.Neuron]:
         '''
@@ -110,7 +114,8 @@ class Network:
             taken:list[neuron.Neuron]=layer.batch(neuron_pool)
 
             # remove a choosen neurons from current pool
-            neuron_pool.remove(taken)
+            for x in taken:
+                neuron_pool.remove(x)
 
     def Forward(self,inputs:np.ndarray)->np.ndarray:
         layer_out=inputs
@@ -119,10 +124,11 @@ class Network:
 
 
         output:np.ndarray=np.zeros(len(self.outpu_layer),dtype=np.float32)
+        i:int=0
 
-
-        for out_neuron,out in zip(self.outpu_layer,output):
-            out=out_neuron.fire(layer_out)
+        for out_neuron in self.outpu_layer:
+            output[i]=out_neuron.fire(layer_out)
+            i+=1
 
         return output
 

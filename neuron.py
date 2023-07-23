@@ -67,3 +67,13 @@ class Neuron:
             helpful for model loading
         '''
         pass        
+
+
+class OutputNeuron:
+    def __init__(self,activation:Activation=Linear):
+        self.activation=activation
+
+    def fire(self,inputs:np.array)->float:
+        self.state=self.activation(np.sum(inputs))
+        return self.state
+    
