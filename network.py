@@ -79,11 +79,12 @@ class Network:
         And information of number of layers and total count of neurons.
         Each layer will have neuron count equal to tau.
     '''
-    def __init__(self,input_size:int,output_size:int,theta:int,tau:int,dotproduct:Product=NumpyDotProduct):
+    def __init__(self,input_size:int,output_size:int,theta:int,tau:int,max_neuron_weight_size:int,dotproduct:Product=NumpyDotProduct):
         '''
             theta - number of layers
             tau - number of neuron population
         '''
+        self.max_neuron_weight_size=max_neuron_weight_size
         self.dot_product=dotproduct
 
         self.input_size=input_size
@@ -97,11 +98,11 @@ class Network:
             self.tau=1
 
         # for now we use only one layer
-        self.theta=1
+        #self.theta=1
 
         self.InitializeLayers()
 
-        self.layers.append(Layer(self.tau,output_size+1,tau))
+        self.layers.append(Layer(self.tau,output_size+1,max_neuron_weight_size))
 
         self.output_activation_function:list[Activation]=[Linear]*(output_size+1)
 
@@ -109,10 +110,10 @@ class Network:
         '''
          For now we will use only one layer for simplicity
         '''
-        self.layers:list[Layer]=[Layer(self.input_size,self.tau,self.tau)]
+        self.layers:list[Layer]=[Layer(self.input_size,self.tau,self.max_neuron_weight_size)]
 
         for i in range(self.theta-1):
-            self.layers.append(Layer(self.tau,self.tau,self.tau))
+            self.layers.append(Layer(self.tau,self.tau,self.max_neuron_weight_size))
 
     def setActivationFunction(self,id:int,activation:Activation):
         if id>=len(self.output_activation_function):
@@ -133,6 +134,7 @@ class Network:
             Take a batches from population and put them into layers.
         '''
         neuron_pool:list[neuron.Neuron]=random.sample(population,self.getNeuronCount())
+        print(len(neuron_pool))
 
         for layer in self.layers:
             taken:list[neuron.Neuron]=layer.batch(neuron_pool)

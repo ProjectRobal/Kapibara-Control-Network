@@ -7,11 +7,12 @@ import activation
 import timeit
 
 
-neurons:list[neuron.Neuron]=[neuron.Neuron(32,activation=activation.relu.Relu)]*256
+# in Kapibara I am going to parse sensor data of about 587 elements
+neurons:list[neuron.Neuron]=[neuron.Neuron(587,activation=activation.relu.Relu)]*2048
 
-network=network.Network(4,1,1,32)
+network=network.Network(587,1,1,128,587)
 
-input=np.random.random(4)
+input=np.random.random(587)
 
 print("Inputs:",input)
 

@@ -34,9 +34,9 @@ class Neuron:
 
         return np.array(output)
 
-    def fire(self,inputs:np.ndarray,mask:list[int]=[])->float:
+    def fire(self,inputs:np.ndarray,mask:list[int]|None=None)->float:
 
-        if len(mask)!=0:
+        if mask is not None and len(mask)<len(self.input_weights):
             masked_array=self.numpy_filter(self.input_weights,[*mask,len(self.input_weights)-1])
         else:
             masked_array=self.input_weights
