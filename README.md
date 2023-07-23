@@ -6,7 +6,7 @@
 It is based or inspired by neuroevolution algorithm such as:
 - NEAT - a network wich can adjust it's size
 - SANE - a network wich evolve neurons rather than entire network
-- ESP - a SANE but wich recurrent neurons
+- ESP - a SANE but with recurrent neurons
 - CCMA - a algorithm wich utilize couple of cooperating networks 
 - ECNN - a network wich not only return action to take but also estimation of quality of action
 
