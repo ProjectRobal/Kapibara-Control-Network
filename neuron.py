@@ -5,70 +5,71 @@ from dotproducts.dotnumpy import NumpyDotProduct
 from base.activation import Activation
 from activation.linear import Linear
 
+import config
+
 
 class Neuron:
-    def __init__(self,input_size:int,activation:Activation=Linear,dot_product:Product=NumpyDotProduct):
+    def __init__(self,input_size:int,output_size:int):
         '''
         input_size - a size of input weights
+        output_size - a size of output weights
 
         state - a current state of a network
-        past_state - a past state used in recurrent calculation
         '''
         # additional weight for past output, used for recurrsion
         # initial random weights
-        self.input_weights=np.random.random(input_size+1)
+        self.input_weights=(np.random.random(input_size)-0.5)*10
+        self.output_weights=(np.random.random(output_size)-0.5)*10
         self.state:float=0.0
-        self.past_state:float=0.0
-        self.dot_product=dot_product
-        self.activation=activation
+        self.dot_product=config.DOT_PRODUCT
+        # count in how many trials neuron has particpated
+        self.trails=0
 
         # evaluation of neuron used for crossover and mutation 
         self.evaluation:float=0.0
 
-    @staticmethod
-    def numpy_filter(x:np.ndarray,mask:list[int])->np.ndarray:
-        output:list[int]=[]
+    def fire(self,inputs:np.ndarray)->np.ndarray:
 
-        for m in mask:
-            output.append(x[m])
+        self.state=self.dot_product(self.input_weights,inputs)
 
-        return np.array(output)
-
-    def fire(self,inputs:np.ndarray,mask:list[int]|None=None)->float:
-
-        if mask is not None and len(mask)<len(self.input_weights):
-            masked_array=self.numpy_filter(self.input_weights,[*mask,len(self.input_weights)-1])
-        else:
-            masked_array=self.input_weights
-
-        self.state=self.activation(self.dot_product(masked_array,[*inputs,self.past_state]))
-        self.past_state=self.state
-
-        return self.state
+        return self.output_weights*self.state
 
 
     def input_size(self)->int:
         return len(self.input_weights)
+    
+    def output_size(self)->int:
+        return len(self.output_weights)
 
     def reset(self):
 
-        self.past_state=self.state
         self.state=0.0
         self.evaluation=0.0
+        self.trails=0.0
 
-    def clear(self):
-        self.state=0.0
-        self.past_state=0.0
-        self.evaluation=0.0
+    def reinitialize(self):
+        self.input_weights=(np.random.random(self.input_size())-0.5)*10
+        self.output_weights=(np.random.random(self.output_size())-0.5)*10
 
     def setEvaluation(self,eval:float):
         self.evaluation=eval
 
     def applyEvaluation(self,eval:float):
         self.evaluation+=eval
+        self.trails+=1
 
     def getEvaluation(self)->float:
         return self.evaluation
+    
+    def Breedable(self)->bool:
+        '''
+            Whether the neuron is ready for breeding
+        '''
+        if self.trails>=config.NUMBER_OF_TRIALS:
+            self.trails=0
+            return True
+        
+        return False
 
     def Dump(self)->bytearray:
         '''
@@ -83,13 +84,4 @@ class Neuron:
             helpful for model loading
         '''
         pass        
-
-
-class OutputNeuron:
-    def __init__(self,activation:Activation=Linear):
-        self.activation=activation
-
-    def fire(self,inputs:np.array)->float:
-        self.state=self.activation(np.sum(inputs))
-        return self.state
     

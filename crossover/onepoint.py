@@ -13,8 +13,8 @@ class OnePoint(Crossover):
     def cross_numpy(x1:np.array,x2:np.array)->np.array:
         output=np.ndarray(len(x1),np.float32)
 
-        output[0:len(x1)/2]=x2[0:len(x1)/2]
-        output[(len(x1)/2)+1:len(x1)]=x1[(len(x1)/2)+1:len(x1)]
+        output[0:int(len(x1)/2)]=x2[0:int(len(x1)/2)]
+        output[(int(len(x1)/2)):len(x1)]=x1[(int(len(x1)/2)):len(x1)]
 
         return output
         
@@ -27,7 +27,3 @@ class OnePoint(Crossover):
         out.output_weights=OnePoint.cross_numpy(neuron1.output_weights,neuron2.output_weights)
 
         return out
-    
-    @staticmethod
-    def CrossNetworks(network1:network.Network,network2:network.Network)->network.Network:
-        raise NotImplementedError()

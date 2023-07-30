@@ -13,7 +13,7 @@ class GaussMutaion(Mutation):
 
     @staticmethod
     def MutateNeuron(neuron:neuron.Neuron)->neuron.Neuron:
-        neuron.clear()
+
         neuron.input_weights+=np.random.normal(size=len(neuron.input_weights))
         neuron.output_weights+=np.random.normal(size=len(neuron.output_weights))
 
