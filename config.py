@@ -24,3 +24,9 @@ NUMBER_OF_TRIALS=5
 # a dot product a method that will be used in program
 
 DOT_PRODUCT=NumpyDotProduct
+
+# some constrains that prevent nan or inf to occur
+
+MAX_VALUE_NUMBER=1000.0
+
+MIN_VALUE_NUMBER=-1000.0

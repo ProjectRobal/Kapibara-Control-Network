@@ -10,6 +10,8 @@ import more_itertools as mit
 
 import config
 
+from util import clip
+
 
 class Block:
     def __init__(self,input_size:int,output_size:int,batch_size:int,population_size:int,strategy:BreedStrategy=BreedStrategy()) -> None:
@@ -67,9 +69,12 @@ class Block:
         for neuron in self.batch:
             output+=neuron.fire(inputs)
 
-        return output        
+        return clip(output)        
     
-    def Mating(self):
+    def ReadyForMating(self)->bool:
+        return self.number_of_breedable_neurons>=self.population_size
+    
+    def Mating(self)->bool:
         '''
             A function that performs crossover and mutation on population.
             A function is called when at least d members of population has performed p times.
@@ -80,7 +85,7 @@ class Block:
         '''
 
         # check if population is ready
-        if self.number_of_breedable_neurons>=self.population_size:
+        if self.ReadyForMating():
 
             population=sorted(self.population,key=lambda x:x.evaluation,reverse=True)
 

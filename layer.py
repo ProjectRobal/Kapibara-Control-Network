@@ -1,1 +1,74 @@
+import numpy as np
+from base.activation import Activation
+from activation.linear import Linear
 import block
+from BreedStrategy import BreedStrategy
+
+from util import clip
+
+class Layer:
+    '''
+        A class that stores blocks, it is recursive layer
+    '''
+
+    def __init__(self,input_size:int,output_size:int,block_number:int,block_nueron_number:int=64,block_population_size:int=512,breed_strategy=BreedStrategy()) -> None:
+
+        self.breed_strategy=breed_strategy
+
+        # it gets outputs from last step
+        self.input_size=input_size+output_size
+        self.output_size=output_size
+
+        self.last_outputs=np.zeros(self.output_size)
+
+        # output activation function
+        self.activation_fun:list[Activation]=[Linear]*self.output_size
+        
+        self.blocks:list[block.Block]=[]
+
+        self.init_blocks(block_number,block_nueron_number,block_population_size)
+    
+    def init_blocks(self,block_number:int,block_nueron_number:int,block_population_size:int):
+        
+        for n in range(block_number):
+            _block=block.Block(self.input_size,self.output_size,block_nueron_number,block_population_size,self.breed_strategy)
+            _block.createPopulation()
+            self.blocks.append(_block)
+
+    def setActivationFun(self,activ_fun:list[Activation]):
+        if len(activ_fun)!=self.output_size:
+            raise ValueError("Activation function list doesn't have required size")
+
+        self.activation_fun=activ_fun
+        
+
+    def fire(self,_inputs:np.ndarray)->np.ndarray:
+        outputs:np.ndarray=np.zeros(self.output_size,dtype=np.float32)
+        
+        inputs=np.concatenate((_inputs,self.last_outputs))
+
+        for block in self.blocks:
+            block.pickBatch()
+            outputs+=block.fire(inputs)/len(self.blocks)
+
+        for n,activ in enumerate(self.activation_fun):
+            outputs[n]=activ(outputs[n])
+
+        self.last_outputs=outputs
+
+        return clip(outputs)
+
+
+    def evalute(self,eval:float):
+        '''
+            A function that evenly pass evaluation to blocks
+        '''
+        eval=eval/len(self.blocks)
+
+        for block in self.blocks:
+            block.Evaluate(eval)
+
+    def mate(self):
+        for block in self.blocks:
+            if block.ReadyForMating():
+                block.Mating()

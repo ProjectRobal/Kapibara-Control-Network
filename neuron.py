@@ -7,6 +7,8 @@ from activation.linear import Linear
 
 import config
 
+from util import clip
+
 
 class Neuron:
     def __init__(self,input_size:int,output_size:int):
@@ -32,7 +34,7 @@ class Neuron:
 
         self.state=self.dot_product(self.input_weights,inputs)
 
-        return self.output_weights*self.state
+        return clip(self.output_weights*self.state)
 
 
     def input_size(self)->int:
@@ -48,8 +50,8 @@ class Neuron:
         self.trails=0.0
 
     def reinitialize(self):
-        self.input_weights=(np.random.random(self.input_size())-0.5)*10
-        self.output_weights=(np.random.random(self.output_size())-0.5)*10
+        self.input_weights=(np.random.random(self.input_size())-0.5)
+        self.output_weights=(np.random.random(self.output_size())-0.5)
 
     def setEvaluation(self,eval:float):
         self.evaluation=eval
