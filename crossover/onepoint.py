@@ -1,7 +1,6 @@
 import numpy as np
 
 import neuron
-import network
 from base.crossover import Crossover
 
 class OnePoint(Crossover):

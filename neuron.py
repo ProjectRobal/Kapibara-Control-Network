@@ -1,9 +1,5 @@
 import numpy as np
-import numpy.ma as ma
-from base.dotproduct import Product
-from dotproducts.dotnumpy import NumpyDotProduct
-from base.activation import Activation
-from activation.linear import Linear
+import io
 
 import config
 
@@ -73,17 +69,52 @@ class Neuron:
         
         return False
 
-    def Dump(self)->bytearray:
+    def dump(self)->bytearray:
         '''
             Function used for neuron serialization,
             helpful for model saving
+            Save inputs weights
+            Save outputs weights
+            Save trails numbers
         '''
-        pass
+        input_neurons=io.BytesIO()
+        output_neurons=io.BytesIO()
+        metadata=io.BytesIO()
 
-    def Load(self,data:bytearray):
+        neuron_metadata=np.array([self.trails],dtype=np.int32)
+
+        np.save(metadata,neuron_metadata)
+        np.save(input_neurons,self.input_weights)
+        np.save(output_neurons,self.output_weights)
+
+        metadata=metadata.getvalue()
+        input_neurons=input_neurons.getvalue()
+        output_neurons=output_neurons.getvalue()
+
+        output=bytearray(metadata)
+        output.extend(input_neurons)
+        output.extend(output_neurons)
+
+        return output
+
+    def load(self,data:bytearray|io.BytesIO):
         '''
             Function used for neuron deserialization,
             helpful for model loading
         '''
-        pass        
-    
+        if type(data) is bytearray:
+            inputs=io.BytesIO(data)
+        else:
+            inputs=data
+
+        metadata=np.load(inputs)
+        input_neurons=np.load(inputs)
+        output_neurons=np.load(inputs)
+
+        self.trails=metadata[0]
+
+        self.input_weights=input_neurons
+        self.output_weights=output_neurons
+
+    def __str__(self) -> str:
+        return "Inputs: "+str(self.input_weights)+"\n"+"Outputs: "+str(self.output_weights)

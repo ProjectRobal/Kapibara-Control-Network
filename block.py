@@ -1,3 +1,4 @@
+import io
 import random
 import numpy as np
 from BreedStrategy import BreedStrategy
@@ -91,9 +92,9 @@ class Block:
 
             population=population[:int(self.population_size*0.5)]
 
-            print("Best neuron eval: ",population[0].evaluation)
+            #print("Best neuron eval: ",population[0].evaluation)
 
-            print("Breeding")
+            #print("Breeding")
 
             self.population=[]
 
@@ -105,7 +106,6 @@ class Block:
             self.MutatePopulation(self.population)
 
             self.number_of_breedable_neurons=0
-
 
             return True
         
@@ -136,8 +136,42 @@ class Block:
         for neuron in population:
             self.strategy.mutation(neuron)
 
-    def Save(self):
-        pass
+    def save(self,memory:io.BufferedIOBase):
+        '''
+        Save neuron population
+        Save input size
+        Save output size
+        Save batch size
+        Save population size
+        Save number_of_breedable_neurons
+        '''
+        metadata=np.array([self.population_size,self.input_size,self.output_size,self.batch_size,self.number_of_breedable_neurons],dtype=np.int32)
 
-    def Load(self):
-        pass
+        np.save(memory,metadata)
+
+        if len(self.population)<self.population_size:
+            self.population=[]
+            self.createPopulation()
+
+        for neuron in self.population:
+            b_neuron:bytearray=neuron.dump()
+            memory.write(b_neuron)
+        
+        #pkl.dump(self.strategy,memory)
+
+    def load(self,memory:io.RawIOBase):
+        metadata=np.load(memory)
+
+        self.population_size=metadata[0]
+        self.input_size=metadata[1]
+        self.output_size=metadata[2]
+        self.batch_size=metadata[3]
+        self.number_of_breedable_neurons=metadata[4]
+
+        self.population.clear()
+        self.batch.clear()
+
+        for i in range(self.population_size):
+            _neuron=neuron.Neuron(0,0)
+            _neuron.load(memory)     
+            self.population.append(_neuron)   

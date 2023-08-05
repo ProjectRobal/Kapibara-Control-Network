@@ -3,7 +3,6 @@ from base.mutation import Mutation
 import numpy as np
 
 import neuron
-import network
 
 class GaussMutaion(Mutation):
     '''
@@ -18,7 +17,3 @@ class GaussMutaion(Mutation):
         neuron.output_weights+=np.random.normal(size=len(neuron.output_weights))
 
         return neuron
-    
-    @staticmethod
-    def MutateNetwork(network:network.Network)->network.Network:
-        raise NotImplementedError()
