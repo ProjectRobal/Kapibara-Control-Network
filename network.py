@@ -80,7 +80,7 @@ class NetworkParser:
 
     @staticmethod
     def save(network:Network,filename:str):
-        with open(filename,"wb") as file:
+        with open(filename,"wb+") as file:
             metadata=np.array([network.input_size,len(network.layers)])
             np.save(file,metadata)
 
