@@ -12,4 +12,4 @@ class Page:
         objects - a object input list from viewer
         network - a target network
         '''
-        object.clear()
+        objects.clear()

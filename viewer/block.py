@@ -24,7 +24,7 @@ class Block(BaseObject):
         
         batch=self.block.batch
 
-        dx=(rect.width/len(batch))+int(self.n_radius/2)
+        dx=(rect.width/len(batch))#+int(self.n_radius/2)
 
         for i in range(len(batch)):
             
@@ -33,6 +33,3 @@ class Block(BaseObject):
             pygame.draw.circle(view,self.color,
                                (int(rect.left+i*dx),rect.bottom-dy),
                                self.n_radius)
-
-        
-    
