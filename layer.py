@@ -23,6 +23,8 @@ class Layer:
 
         self.last_outputs=np.zeros(self.output_size)
 
+        self.inputs=np.zeros(self.input_size+self.output_size)
+
         # output activation function
         self.activation_fun:list[Activation]=[Linear]*self.output_size
         
