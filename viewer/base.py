@@ -40,5 +40,22 @@ class Label(BaseObject):
 
         view.blit(text,textRect)
 
-        
+
+class Rectangle(BaseObject):
+    def __init__(self,rect:Rect,color:tuple[int,int,int]) -> None:
+        super().__init__()
+        '''
+        rect - a object that will define geoemetry and hitbox of button
+        text - a text that will be displayed on button
+        color - a color of the rect
+        text_color - a color of the text
+        '''
+        self.rect=rect
+        self.color=color
+    
+    def draw(self,view:pygame.Surface):
+
+        pygame.draw.rect(view,self.color,self.rect)
+
+
 
