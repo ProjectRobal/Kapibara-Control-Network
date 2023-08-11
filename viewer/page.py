@@ -7,8 +7,9 @@ Abstract class used by viewer to initialize scene.
 from .baseobject import BaseObject
 
 class Page:
-    def __init__(self,object:list[BaseObject]) -> None:
+    def __init__(self,objects:list[BaseObject],network) -> None:
         '''
-        A object input list from viewer
+        objects - a object input list from viewer
+        network - a target network
         '''
         object.clear()

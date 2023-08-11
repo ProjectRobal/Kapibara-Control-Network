@@ -11,10 +11,10 @@ class BaseObject:
         raise NotImplementedError
 
     def on_mouse_cord(self,mouse_cord:tuple[int,int]):
-        raise NotImplementedError()
+        pass
 
     def mouse_click(self,mouse_cord:tuple[int,int]):
-        raise NotImplementedError()
+        pass
     
     def mouse_relased(self):
-        raise NotImplementedError()
+        pass

@@ -21,7 +21,7 @@ class Button(BaseObject):
         self.text=text
         self.color=color
         self.text_color=text_color
-        self.texty_scale=0.1
+        self.texty_scale=0.18
         self.highligh_color=(255-color[0],255-color[1],255-color[2])
 
         self.on_click=None
@@ -40,7 +40,7 @@ class Button(BaseObject):
 
         font_height=int(self.rect.height*self.texty_scale)
 
-        font = pygame.font.Font('/usr/share/fonts/truetype/Sarai/Sarai.ttf', font_height)
+        font = pygame.font.Font('viewer/fonts/arial.ttf', font_height)
 
         text=font.render(self.text,True,self.text_color)
 

@@ -6,6 +6,8 @@ import network
 
 from viewer.button import Button
 
+import viewer.base as base
+
 network1=network.Network(6)
 
 network1.addLayer(256,32)
@@ -19,9 +21,12 @@ view=NeuralViewer(mode,network1)
 
 button=Button(pygame.rect.Rect(0,0,200,200),"Hello",(255,0,0),(0,0,0))
 
+label=base.Label(pygame.rect.Rect(50,300,50,50),"Stachu",(0,0,0))
+
 button.on_click=lambda x: print("Hello world!")
 
 view.objects.append(button)
+view.objects.append(label)
 
 Run=True
 
