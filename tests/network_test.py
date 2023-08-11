@@ -105,6 +105,8 @@ for n in range(2000):
 
     print("Time: ",timeit.default_timer()-start," s")
 
+
+plt.figure()
 network.NetworkParser.save(network1,"tests/checkpoint/last.chk")
 plt.plot(range(len(x)),x)
 print("Reward variance: ",np.var(x))

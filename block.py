@@ -48,21 +48,31 @@ class Block:
     def PopulationSize(self)->int:
         return len(self.population)
     
+    def choice(self,population:list[neuron.Neuron],batch_size:int)->list[neuron.Neuron]:
+        # sort it
+        population=sorted(population,key=lambda x:x.Q,reverse=True)
+        if population[0].Q>0:
+            print("Q: ",population[0].Q)
+
+        batch:list[neuron.Neuron]=[]
+
+        while batch_size>0:
+            x=int(np.random.random(1)*batch_size*2)
+            
+            batch.append(population[x])
+            population.pop(x)
+
+            batch_size-=1
+        
+        return batch
+    
     def pickBatch(self):
         '''
             A function that take random neurons from population to create batch of active neurons
         '''
-        #self.batch=random.sample(self.population,self.batch_size)
-        probability=np.array([neuron.Qvalue()+0.0000000001 for neuron in self.population])
 
-        sum=np.sum(probability)
-
-        if sum!=0:
-            probability=probability/sum
-        else:
-            probability=np.ones(self.PopulationSize())/self.PopulationSize()
-
-        self.batch=np.random.choice(self.population,self.batch_size,replace=False,p=probability)
+        self.batch=self.choice(self.population,self.batch_size)
+        #print("The best neuron Q: ",self.batch[0].Qvalue())
 
     def Evaluate(self,evaluation:float):
         _evaluation=evaluation/self.batch_size

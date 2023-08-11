@@ -73,7 +73,7 @@ class Neuron:
         return False
     
     def UpdateQ(self):
-        self.Q=self.evaluation+config.LEARING_RATE*self.Q
+        self.Q=clip(self.evaluation+config.LEARING_RATE*self.Q)
 
     def dump(self)->bytearray:
         '''
@@ -118,8 +118,7 @@ class Neuron:
         output_neurons=np.load(inputs)
 
         self.trails=metadata[0]
-        self.Q=metadata[1]
-
+        #self.Q=metadata[1]
         self.input_weights=input_neurons
         self.output_weights=output_neurons
 

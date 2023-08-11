@@ -31,8 +31,8 @@ DOT_PRODUCT=NumpyDotProduct
 
 # some constrains that prevent nan or inf to occur
 
-MAX_VALUE_NUMBER=1000.0
+MAX_VALUE_NUMBER=100000.0
 
-MIN_VALUE_NUMBER=-1000.0
+MIN_VALUE_NUMBER=-100000.0
 
 
