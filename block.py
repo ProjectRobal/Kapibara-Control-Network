@@ -52,13 +52,24 @@ class Block:
         '''
             A function that take random neurons from population to create batch of active neurons
         '''
-        self.batch=random.sample(self.population,self.batch_size)
+        #self.batch=random.sample(self.population,self.batch_size)
+        probability=np.array([neuron.Qvalue()+0.0000000001 for neuron in self.population])
+
+        sum=np.sum(probability)
+
+        if sum!=0:
+            probability=probability/sum
+        else:
+            probability=np.ones(self.PopulationSize())/self.PopulationSize()
+
+        self.batch=np.random.choice(self.population,self.batch_size,replace=False,p=probability)
 
     def Evaluate(self,evaluation:float):
         _evaluation=evaluation/self.batch_size
         for neuron in self.batch:
             neuron.applyEvaluation(_evaluation)
             if neuron.Breedable():
+                neuron.UpdateQ()
                 self.number_of_breedable_neurons+=1
     
     def fire(self,inputs:np.ndarray)->np.ndarray:
@@ -73,7 +84,7 @@ class Block:
         return clip(output)        
     
     def ReadyForMating(self)->bool:
-        return self.number_of_breedable_neurons>=self.population_size
+        return self.number_of_breedable_neurons>=self.batch_size
     
     def Mating(self)->bool:
         '''
@@ -88,11 +99,12 @@ class Block:
         # check if population is ready
         if self.ReadyForMating():
 
-            population=sorted(self.population,key=lambda x:x.evaluation,reverse=True)
+            population=sorted(self.population,key=lambda x:x.Q,reverse=True)
 
+            # get 50% neurons sorted by thier Q value we are extracting the best neruons here
             population=population[:int(self.population_size*0.5)]
 
-            #print("Best neuron eval: ",population[0].evaluation)
+            #print("Best neuron Q value : ",population[0].Q)
 
             #print("Breeding")
 

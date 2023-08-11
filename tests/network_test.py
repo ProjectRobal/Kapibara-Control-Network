@@ -2,12 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import layer
 import network
+from BreedStrategy import BreedStrategy
 import math
 
 import timeit
 
 import sys, os
 import datetime
+
+from crossover.qonepoint import QOnePoint
 
 
 '''
@@ -35,10 +38,19 @@ We can put Q for every neurons and pick neurons with biggest Q.
 
 Or we can keep copy of best network and inject neurons from best network into current network.
 
+I would try with the first proposition.
+
+ With Q valued neurons network coverage to best solution much faster and the reward distribution across
+steps seems to be more even. But using weighted methods of getting batch of neurons seems to slow down 
+inner working of network.
+
 '''
 
 # readings from sensors plus compressed audio spectogram, outputs: motor output power and three action (froward,backward,stop)
-network1=network.Network(6)
+breed_str=BreedStrategy()
+breed_str.cross=QOnePoint
+
+network1=network.Network(6,breed_str)
 
 network1.addLayer(256,32)
 network1.addLayer(2,16)
@@ -70,8 +82,8 @@ x=[]
 
 best_val=-1000
 
-for n in range(20000):
-    #start=timeit.default_timer()
+for n in range(2000):
+    start=timeit.default_timer()
 
     output=network1.step(inputs)
 
@@ -91,7 +103,7 @@ for n in range(20000):
 
     #print("Output reward",eval)
 
-    #print("Time: ",timeit.default_timer()-start," s")
+    print("Time: ",timeit.default_timer()-start," s")
 
 network.NetworkParser.save(network1,"tests/checkpoint/last.chk")
 plt.plot(range(len(x)),x)

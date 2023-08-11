@@ -25,13 +25,16 @@ class Neuron:
 
         # evaluation of neuron used for crossover and mutation 
         self.evaluation:float=0.0
+        self.Q:float=0.0
 
     def fire(self,inputs:np.ndarray)->np.ndarray:
 
         self.state=self.dot_product(self.input_weights,inputs)
 
         return clip(self.output_weights*self.state)
-
+    
+    def Qvalue(self)->float:
+        return self.Q
 
     def input_size(self)->int:
         return len(self.input_weights)
@@ -68,6 +71,9 @@ class Neuron:
             return True
         
         return False
+    
+    def UpdateQ(self):
+        self.Q=self.evaluation+config.LEARING_RATE*self.Q
 
     def dump(self)->bytearray:
         '''
@@ -81,7 +87,7 @@ class Neuron:
         output_neurons=io.BytesIO()
         metadata=io.BytesIO()
 
-        neuron_metadata=np.array([self.trails],dtype=np.int32)
+        neuron_metadata=np.array([self.trails,self.Q],dtype=np.int32)
 
         np.save(metadata,neuron_metadata)
         np.save(input_neurons,self.input_weights)
@@ -112,6 +118,7 @@ class Neuron:
         output_neurons=np.load(inputs)
 
         self.trails=metadata[0]
+        self.Q=metadata[1]
 
         self.input_weights=input_neurons
         self.output_weights=output_neurons
