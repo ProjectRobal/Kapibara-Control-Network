@@ -25,11 +25,14 @@ label=base.Label(pygame.rect.Rect(50,300,50,50),"Stachu",(0,0,0))
 
 rect=base.Rectangle(pygame.rect.Rect(50,300,50,50),(0,0,255))
 
+node=base.Nodes((300,300),25,(0,0,0),(0,0,255))
+
 button.on_click=lambda x: print("Hello world!")
 
 view.objects.append(button)
 view.objects.append(rect)
 view.objects.append(label)
+view.objects.append(node)
 
 Run=True
 

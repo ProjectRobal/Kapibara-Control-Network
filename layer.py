@@ -46,11 +46,11 @@ class Layer:
     def fire(self,_inputs:np.ndarray)->np.ndarray:
         outputs:np.ndarray=np.zeros(self.output_size,dtype=np.float32)
         
-        inputs=np.concatenate((_inputs,self.last_outputs))
+        self.inputs=np.concatenate((_inputs,self.last_outputs))
 
         for block in self.blocks:
             block.pickBatch()
-            outputs+=block.fire(inputs)/len(self.blocks)
+            outputs+=block.fire(self.inputs)/len(self.blocks)
 
         for n,activ in enumerate(self.activation_fun):
             outputs[n]=clip(activ(outputs[n]))
