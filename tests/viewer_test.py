@@ -22,7 +22,7 @@ network1.step(np.random.random(6))
 
 pygame.init()
 
-mode=pygame.display.set_mode((1600,600))
+mode=pygame.display.set_mode((800,600),pygame.RESIZABLE)
 
 view=NeuralViewer(mode,network1)
 

@@ -1,4 +1,5 @@
 import pygame
+import numpy as np
 
 from .base import Rectangle
 from .baseobject import BaseObject
@@ -28,8 +29,8 @@ class Block(BaseObject):
 
         for i in range(len(batch)):
             
-            dy=(batch[i].evaluation/self.height_res)*rect.height
+            dy=int(np.clip((batch[i].evaluation/self.height_res)*rect.height,0,rect.height))
 
             pygame.draw.circle(view,self.color,
-                               (int(rect.left+i*dx),rect.bottom-dy),
+                               (int(rect.left+(i+0.5)*dx),rect.bottom-dy),
                                self.n_radius)
