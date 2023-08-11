@@ -71,7 +71,7 @@ x=[]
 best_val=-1000
 
 for n in range(20000):
-    #start=timeit.default_timer()
+    start=timeit.default_timer()
 
     output=network1.step(inputs)
 
@@ -91,7 +91,7 @@ for n in range(20000):
 
     #print("Output reward",eval)
 
-    #print("Time: ",timeit.default_timer()-start," s")
+    print("Time: ",timeit.default_timer()-start," s")
 
 network.NetworkParser.save(network1,"tests/checkpoint/last.chk")
 plt.plot(range(len(x)),x)
