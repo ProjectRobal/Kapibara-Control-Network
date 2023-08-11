@@ -29,14 +29,14 @@ class Button(BaseObject):
         self._overlaped=False
         self.clicked=False
 
-    def draw(self,view:pygame.Surface):
+    def draw(self,view:pygame.Surface,offset:tuple[int,int]):
 
         if self._overlaped:
             color=self.color
         else:
             color=self.highligh_color
 
-        pygame.draw.rect(view,color,self.rect)
+        pygame.draw.rect(view,color,Rect(self.rect.left+offset[0],self.rect.top+offset[1],self.rect.width,self.rect.height))
 
         font_height=int(self.rect.height*self.texty_scale)
 
@@ -46,7 +46,7 @@ class Button(BaseObject):
 
         textRect=text.get_rect()
 
-        textRect.center=self.rect.center
+        textRect.center=(self.rect.center[0]+offset[0],self.rect.center[1]+offset[1])
 
         view.blit(text,textRect)
 

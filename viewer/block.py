@@ -17,9 +17,9 @@ class Block(BaseObject):
         self.height_res=res
         self.n_radius=neuron_radius
 
-    def draw(self,view):
+    def draw(self,view,offset:tuple[int,int]):
         
-        self.rect.draw(view)
+        self.rect.draw(view,offset)
 
         rect=self.rect.rect
         
@@ -32,5 +32,5 @@ class Block(BaseObject):
             dy=int(np.clip((batch[i].evaluation/self.height_res)*rect.height,0,rect.height))
 
             pygame.draw.circle(view,self.color,
-                               (int(rect.left+(i+0.5)*dx),rect.bottom-dy),
+                               (int(rect.left+(i+0.5)*dx) + offset[0],rect.bottom-dy + offset[1]),
                                self.n_radius)

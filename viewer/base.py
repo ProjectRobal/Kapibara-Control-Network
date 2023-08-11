@@ -24,10 +24,11 @@ class Label(BaseObject):
         self.text_color=text_color
         self.texty_scale=0.5
     
-    def draw(self,view:pygame.Surface):
+    def draw(self,view:pygame.Surface,offset:tuple[int,int]):
 
         if self.color is not None:
-            pygame.draw.rect(view,self.color,self.rect)
+
+            pygame.draw.rect(view,self.color,Rect(self.rect.left+offset[0],self.rect.top+offset[1],self.rect.width,self.rect.height))
 
         font_height=int(self.rect.height*self.texty_scale)
 
@@ -37,7 +38,7 @@ class Label(BaseObject):
 
         textRect=text.get_rect()
 
-        textRect.center=self.rect.center
+        textRect.center=(self.rect.center[0]+offset[0],self.rect.center[1]+offset[1])
 
         view.blit(text,textRect)
 
@@ -54,9 +55,9 @@ class Rectangle(BaseObject):
         self.rect=rect
         self.color=color
     
-    def draw(self,view:pygame.Surface):
+    def draw(self,view:pygame.Surface,offset:tuple[int,int]):
 
-        pygame.draw.rect(view,self.color,self.rect)
+        pygame.draw.rect(view,self.color,Rect(self.rect.left+offset[0],self.rect.top+offset[1],self.rect.width,self.rect.height))
 
 
 
@@ -80,10 +81,10 @@ class Nodes(BaseObject):
     def setNumber(self,number:float):
         self.number=np.round(number,3)
 
-    def draw(self,view:pygame.Surface):
+    def draw(self,view:pygame.Surface,offset:tuple[int,int]):
 
         if self.color is not None:
-            pygame.draw.circle(view,self.color,self.center,self.radius)
+            pygame.draw.circle(view,self.color,(self.center[0]+offset[0],self.center[1]+offset[1]),self.radius)
 
         font_height=int(self.radius*self.texty_scale)
 
@@ -93,6 +94,6 @@ class Nodes(BaseObject):
 
         textRect=text.get_rect()
 
-        textRect.center=self.center
+        textRect.center=(self.center[0]+offset[0],self.center[1]+offset[1])
 
         view.blit(text,textRect)

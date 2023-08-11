@@ -26,8 +26,8 @@ class NeuronPage(Page):
             layer_name="Layer: "+str(i+1)
             label=base.Label(pygame.Rect(-len(layer_name)*10,int(dy+base_height/2),100,50),layer_name,(0,0,0))
             rect=base.Rectangle(pygame.Rect(0,dy,_width,int(base_height+base_offset_y*2)),(255,0,0))
-            layer_input=Layer_Inputs(layer,(_width/2,int(dy-50)),10,(255,0,0))
-            layer_outputs=Layer_Outputs(layer,(_width/2,int(dy+base_height+base_offset_y*2)+50),10,(255,0,0))
+            layer_input=Layer_Inputs(layer,(_width/2,int(dy-50)),30,(255,0,0))
+            layer_outputs=Layer_Outputs(layer,(_width/2,int(dy+base_height+base_offset_y*2)+50),30,(255,0,0))
 
             objects.append(rect)
             objects.append(label)

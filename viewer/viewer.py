@@ -42,9 +42,9 @@ class NeuralViewer:
                     obj.mouse_click(pygame.mouse.get_pos())
             
 
-    def update(self,view:pygame.Surface):
+    def update(self,view:pygame.Surface,offset:tuple[int,int]=(0,0)):
         '''
         Class main routine in wich network will be drawn
         '''
         for obj in self.objects:
-            obj.draw(view)
+            obj.draw(view,offset)

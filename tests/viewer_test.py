@@ -64,6 +64,9 @@ Run=True
 
 key_pressed=False
 
+x:int=0
+y:int=0
+
 while Run:
 
     for event in pygame.event.get():
@@ -77,6 +80,15 @@ while Run:
                     camera.zoom(0.9)
             if event.key == pygame.K_e:
                     camera.zoom(1.1)
+            if event.key == pygame.K_w:
+                    y+=10
+            if event.key == pygame.K_s:
+                    y-=10
+            if event.key == pygame.K_a:
+                    x+=10
+            if event.key == pygame.K_d:
+                    x-=10
+
 
         if event.type==KEYUP:
             if  key_pressed:
@@ -89,7 +101,7 @@ while Run:
 
     camera.surface().fill((255,255,255))
 
-    view.update(camera.surface())
+    view.update(camera.surface(),(x,y))
 
     camera.blit(mode)
 
