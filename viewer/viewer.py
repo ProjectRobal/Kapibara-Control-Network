@@ -17,12 +17,11 @@ from .baseobject import BaseObject
 from .page import Page
 
 class NeuralViewer:
-    def __init__(self,view:pygame.Surface,network:Network) -> None:
+    def __init__(self,network:Network) -> None:
         '''
         view - a pygame application view used for rendering network view.
         network - a network wich is going to visualize by class
         '''
-        self.view=view
         self.network=network
         self.objects:list[BaseObject]=[]
 
@@ -43,9 +42,9 @@ class NeuralViewer:
                     obj.mouse_click(pygame.mouse.get_pos())
             
 
-    def update(self):
+    def update(self,view:pygame.Surface):
         '''
         Class main routine in wich network will be drawn
         '''
         for obj in self.objects:
-            obj.draw(self.view)
+            obj.draw(view)
