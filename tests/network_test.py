@@ -44,6 +44,16 @@ I would try with the first proposition.
 steps seems to be more even. But using weighted methods of getting batch of neurons seems to slow down 
 inner working of network.
 
+ I think I have found an issue, the ouputs are always at thier limits. I need to find out why?  
+ 
+ What I can consider:
+
+ -Input and output normalization
+
+ -Other weights intialization random distribution
+
+ -When network doesn't progress for long time reinitialize population
+
 '''
 
 last_eval:float=0
@@ -97,14 +107,14 @@ def error_to_rewrd(e:float)->float:
 
 x=[]
 
-best_val=-1000
+best_val=0
 
 for n in range(2000):
     start=timeit.default_timer()
 
-    output=network1.step(inputs)
+    output=network1.step(inputs/1.0)
 
-    error=regression_test(output[0],output[1])
+    error=regression_test(output[0]*1.0,output[1]*1.0)
 
     eval=error_to_rewrd(error)
 
@@ -119,10 +129,11 @@ for n in range(2000):
         print("Best reward after: ",n," steps")
         print(eval)
         network.NetworkParser.save(network1,"tests/checkpoint/best.chk")
+    else:
+        print("Time: ",timeit.default_timer()-start," s")
 
     #print("Output reward",eval)
 
-    print("Time: ",timeit.default_timer()-start," s")
 
 
 plt.figure()

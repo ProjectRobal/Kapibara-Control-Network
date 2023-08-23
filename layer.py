@@ -50,7 +50,7 @@ class Layer:
 
         for block in self.blocks:
             block.pickBatch()
-            outputs+=block.fire(inputs)/len(self.blocks)
+            outputs+=block.fire(inputs)#/len(self.blocks)
 
         for n,activ in enumerate(self.activation_fun):
             outputs[n]=clip(activ(outputs[n]))

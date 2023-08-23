@@ -122,7 +122,7 @@ class Block:
 
             #print("Best neuron Q value : ",population[0].Q)
 
-            print("Breeding")
+            #print("Breeding")
 
             self.population=[]
 
