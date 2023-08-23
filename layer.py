@@ -69,6 +69,10 @@ class Layer:
         for block in self.blocks:
             block.Evaluate(eval)
 
+    def changeBestRatioPopulation(self,depsilon:float):
+        for block in self.blocks:
+            block.updateEpsilon(block.getEpsilon+depsilon)        
+
     def mate(self):
         for block in self.blocks:
             if block.ReadyForMating():

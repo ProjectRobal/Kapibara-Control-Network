@@ -30,12 +30,21 @@ class Block:
 
         self.strategy=strategy
 
+        # ratio between amount of best neurons and population size
+        self.epsilon:float=1.0
+
         # an entire population of neurons
         self.population:list[neuron.Neuron]=[]
 
         # a couple of neurons picked for partipication
         self.batch:list[neuron.Neuron]=[]
 
+    
+    def getEpsilon(self)->float:
+        return self.epsilon
+
+    def updateEpsilon(self,epsilon:float):
+        self.epsilon=np.clip(epsilon,0.0,1.0)
     
     def createPopulation(self):
         '''
@@ -51,19 +60,13 @@ class Block:
     def choice(self,population:list[neuron.Neuron],batch_size:int)->list[neuron.Neuron]:
         # sort it
         population=sorted(population,key=lambda x:x.Q,reverse=True)
-        if population[0].Q>0:
-            print("Q: ",population[0].Q)
 
         batch:list[neuron.Neuron]=[]
-
-        while batch_size>0:
-            x=int(np.random.random(1)*batch_size*2)
-            
-            batch.append(population[x])
-            population.pop(x)
-
-            batch_size-=1
         
+        batch.extend(population[:int(self.epsilon*self.population_size)])
+        
+        batch.extend(random.sample(population[int(self.epsilon*self.population_size):]))
+
         return batch
     
     def pickBatch(self):
@@ -167,7 +170,7 @@ class Block:
         Save population size
         Save number_of_breedable_neurons
         '''
-        metadata=np.array([self.population_size,self.input_size,self.output_size,self.batch_size,self.number_of_breedable_neurons],dtype=np.int32)
+        metadata=np.array([self.population_size,self.input_size,self.output_size,self.batch_size,self.number_of_breedable_neurons,self.epsilon],dtype=np.int32)
 
         np.save(memory,metadata)
 
@@ -189,6 +192,7 @@ class Block:
         self.output_size=metadata[2]
         self.batch_size=metadata[3]
         self.number_of_breedable_neurons=metadata[4]
+        self.epsilon=metadata[5]
 
         self.population.clear()
         self.batch.clear()

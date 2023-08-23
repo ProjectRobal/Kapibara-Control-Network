@@ -16,7 +16,7 @@ LEAST_NEURONS_K=0.6
 NUERONS_TO_REMOVE=0.25
 
 # a precentage number of amount of population that took required number of actions in block, required for mating to occur
-MATING_TRESHOLD=0.9
+MATING_TRESHOLD=1.0
 
 # a number of trials nueron has to take before mating
 NUMBER_OF_TRIALS=10

@@ -8,14 +8,16 @@ from activation.linear import Linear
 from BreedStrategy import BreedStrategy
 
 import layer
-    
+
+TrendFunction=function[float,object]
 
 class Network:
+    
     '''
         A class that defines network.
         It stores layers wich defines hidden layers of network.
     '''
-    def __init__(self,input_size:int,breed_strategy:BreedStrategy=BreedStrategy()):
+    def __init__(self,input_size:int,trend_function:TrendFunction=None,breed_strategy:BreedStrategy=BreedStrategy()):
         self.input_size=input_size
         self.breed_strategy=breed_strategy
 
@@ -23,6 +25,8 @@ class Network:
 
         # copy of best performed layer
         self.best_layer:list[layer.Layer]=[]
+
+        self.trend_function:TrendFunction=trend_function
 
     def addLayer(self,output_size:int,block_number:int,activation:list[Activation]=[],block_params:tuple[int,int]=(16,512)):
         '''
@@ -69,8 +73,14 @@ class Network:
     def evalute(self,eval:float):
         eval=eval/len(self.layers)
 
+        dpopulation:float=0.0
+
+        if self.trend_function is not None:
+            dpopulation=self.trend_function(eval)
+
         for l in self.layers:
             l.evalute(eval)
+            l.changeBestRatioPopulation(dpopulation)
 
 
 class NetworkParser:
