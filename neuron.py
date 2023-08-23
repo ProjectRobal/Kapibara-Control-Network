@@ -57,7 +57,8 @@ class Neuron:
 
     def applyEvaluation(self,eval:float):
         self.evaluation+=eval
-        self.trails+=1
+        if not self.Breedable():
+            self.trails+=1
 
     def getEvaluation(self)->float:
         return self.evaluation
@@ -67,13 +68,14 @@ class Neuron:
             Whether the neuron is ready for breeding
         '''
         if self.trails>=config.NUMBER_OF_TRIALS:
-            self.trails=0
+            #self.trails=0
             return True
         
         return False
     
     def UpdateQ(self):
         self.Q=clip(self.evaluation+config.LEARING_RATE*self.Q)
+        self.evaluation=0.0
 
     def dump(self)->bytearray:
         '''

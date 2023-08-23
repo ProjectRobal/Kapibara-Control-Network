@@ -46,6 +46,21 @@ inner working of network.
 
 '''
 
+last_eval:float=0
+
+epsilon=0.0
+
+def trendfunction(eval:float,network:network.Network)->float:
+    global epsilon
+
+    if eval==0:
+        return epsilon
+
+    if eval>last_eval:
+        epsilon+=1.0
+    
+    return epsilon
+    
 # readings from sensors plus compressed audio spectogram, outputs: motor output power and three action (froward,backward,stop)
 breed_str=BreedStrategy()
 breed_str.cross=QOnePoint
@@ -58,6 +73,8 @@ network1.addLayer(2,16)
 if os.path.exists("tests/checkpoint/last.chk"):
     print("Loading checkpoint!!")
     network1=network.NetworkParser.load("tests/checkpoint/last.chk")
+
+network1.setTrendFunction(trendfunction)
 
 # linear regression problem
 
@@ -94,6 +111,8 @@ for n in range(2000):
     x.append(eval)
 
     network1.evalute(eval)
+
+    last_eval=eval
 
     if eval>best_val:
         best_val=eval

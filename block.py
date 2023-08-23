@@ -31,7 +31,7 @@ class Block:
         self.strategy=strategy
 
         # ratio between amount of best neurons and population size
-        self.epsilon:float=1.0
+        self.epsilon:float=0.0
 
         # an entire population of neurons
         self.population:list[neuron.Neuron]=[]
@@ -63,9 +63,12 @@ class Block:
 
         batch:list[neuron.Neuron]=[]
         
-        batch.extend(population[:int(self.epsilon*self.population_size)])
-        
-        batch.extend(random.sample(population[int(self.epsilon*self.population_size):]))
+        batch.extend(population[:int(self.epsilon*batch_size)])
+
+        batch_space_left:int=batch_size-int(self.epsilon*batch_size)
+
+        if batch_space_left>0:
+            batch.extend(random.sample(population[int(self.epsilon*batch_size):],batch_space_left))
 
         return batch
     
@@ -81,8 +84,8 @@ class Block:
         _evaluation=evaluation/self.batch_size
         for neuron in self.batch:
             neuron.applyEvaluation(_evaluation)
+            neuron.UpdateQ()
             if neuron.Breedable():
-                neuron.UpdateQ()
                 self.number_of_breedable_neurons+=1
     
     def fire(self,inputs:np.ndarray)->np.ndarray:
@@ -119,7 +122,7 @@ class Block:
 
             #print("Best neuron Q value : ",population[0].Q)
 
-            #print("Breeding")
+            print("Breeding")
 
             self.population=[]
 

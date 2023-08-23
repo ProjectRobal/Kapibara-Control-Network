@@ -71,7 +71,7 @@ class Layer:
 
     def changeBestRatioPopulation(self,depsilon:float):
         for block in self.blocks:
-            block.updateEpsilon(block.getEpsilon+depsilon)        
+            block.updateEpsilon(depsilon)        
 
     def mate(self):
         for block in self.blocks:
