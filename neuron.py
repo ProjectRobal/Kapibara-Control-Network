@@ -16,8 +16,8 @@ class Neuron:
         '''
         # additional weight for past output, used for recurrsion
         # initial random weights
-        self.input_weights=np.random.normal(input_size)
-        self.output_weights=np.random.normal(output_size)
+        self.input_weights=np.random.normal(0,1,input_size)
+        self.output_weights=np.random.normal(0,1,output_size)
         self.state:float=0.0
         self.dot_product=config.DOT_PRODUCT
         # count in how many trials neuron has particpated
