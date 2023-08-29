@@ -43,39 +43,22 @@ class Neuron:
         return len(self.output_weights)
 
     def reset(self):
-
         self.state=0.0
-        self.evaluation=0.0
         self.trails=0.0
 
     def reinitialize(self):
-        self.input_weights=(np.random.random(self.input_size())-0.5)
-        self.output_weights=(np.random.random(self.output_size())-0.5)
-
-    def setEvaluation(self,eval:float):
-        self.evaluation=eval
-
-    def applyEvaluation(self,eval:float):
-        self.evaluation+=eval
-        if not self.Breedable():
-            self.trails+=1
-
-    def getEvaluation(self)->float:
-        return self.evaluation
+        self.input_weights=np.random.normal(0,1,self.input_size())
+        self.output_weights=np.random.normal(0,1,self.output_size())
     
     def Breedable(self)->bool:
         '''
             Whether the neuron is ready for breeding
         '''
-        if self.trails>=config.NUMBER_OF_TRIALS:
-            #self.trails=0
-            return True
-        
-        return False
+        return self.trails==config.NUMBER_OF_TRIALS
     
-    def UpdateQ(self):
-        self.Q=clip(self.evaluation+config.LEARING_RATE*self.Q)
-        self.evaluation=0.0
+    def UpdateQ(self,eval:float):
+        self.Q=clip(eval+config.LEARING_RATE*self.Q)
+        self.trails+=1
 
     def dump(self)->bytearray:
         '''

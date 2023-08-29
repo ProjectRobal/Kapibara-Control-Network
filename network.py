@@ -32,6 +32,14 @@ class Network:
     def setTrendFunction(self,trend_function:TrendFunction):
         self.trend_function=trend_function
 
+    
+    def getLayerBestRatioPopulation(self,id:int)->float:
+
+        if id>=len(self.layers) or id<0:
+            id=0
+
+        return self.layers[id].getBestRatioPopulation()
+
 
     def addLayer(self,output_size:int,block_number:int,activation:list[Activation]=[],block_params:tuple[int,int]=(16,512)):
         '''

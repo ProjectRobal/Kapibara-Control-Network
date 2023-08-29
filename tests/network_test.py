@@ -12,6 +12,7 @@ import datetime
 
 from crossover.qonepoint import QOnePoint
 
+from buffer import TrendBuffer
 
 '''
 
@@ -48,28 +49,38 @@ inner working of network.
  
  What I can consider:
 
- -Input and output normalization
+ -Input and output normalization <
 
- -Other weights intialization random distribution
+ -Other weights intialization random distribution < 
 
  -When network doesn't progress for long time reinitialize population
 
+ -Don't change batch and it's Q values when epsilon is equal to 1.0
+
+ -When mating keep only 40% of best neurons, the rest of 20% should be random neurons. <
+
+ Notes:
+ Multiple Breeding prompts are caused by existence of multiple blocks.
+
 '''
 
-last_eval:float=0
+evaluation_trend:TrendBuffer=TrendBuffer(20)
 
 epsilon=0.0
 
+trends:float=[]
+
 def trendfunction(eval:float,network:network.Network)->float:
-    global epsilon
 
-    if eval==0:
-        return epsilon
+    trend:float=evaluation_trend.trendline()
+    trends.append(trend)
 
-    if eval>last_eval:
-        epsilon+=1.0
+    if trend>0.0:
+        return 0.01
+    elif trend<0.0:
+        return -0.01
     
-    return epsilon
+    return 0.0
     
 # readings from sensors plus compressed audio spectogram, outputs: motor output power and three action (froward,backward,stop)
 breed_str=BreedStrategy()
@@ -80,9 +91,9 @@ network1=network.Network(6,breed_str)
 network1.addLayer(256,32)
 network1.addLayer(2,16)
 
-if os.path.exists("tests/checkpoint/last.chk"):
-    print("Loading checkpoint!!")
-    network1=network.NetworkParser.load("tests/checkpoint/last.chk")
+#if os.path.exists("tests/checkpoint/last.chk"):
+#    print("Loading checkpoint!!")
+#    network1=network.NetworkParser.load("tests/checkpoint/last.chk")
 
 network1.setTrendFunction(trendfunction)
 
@@ -109,20 +120,22 @@ x=[]
 
 best_val=0
 
-for n in range(2000):
+for n in range(5000):
     start=timeit.default_timer()
 
-    output=network1.step(inputs/1.0)
+    output=network1.step(inputs/10000.0)
 
-    error=regression_test(output[0]*1.0,output[1]*1.0)
+    error=regression_test(output[0]*10000.0,output[1]*10000.0)
 
     eval=error_to_rewrd(error)
 
     x.append(eval)
 
+    evaluation_trend.push(eval)
+
     network1.evalute(eval)
 
-    last_eval=eval
+    print("Epsilon: ",network1.getLayerBestRatioPopulation(0))
 
     if eval>best_val:
         best_val=eval
@@ -139,6 +152,7 @@ for n in range(2000):
 plt.figure()
 network.NetworkParser.save(network1,"tests/checkpoint/last.chk")
 plt.plot(range(len(x)),x)
+plt.plot(range(len(trends)),trends)
 print("Reward variance: ",np.var(x))
 plt.savefig("tests/imgs/figure"+str(datetime.datetime.now())+".png")
 

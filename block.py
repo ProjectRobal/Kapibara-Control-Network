@@ -42,9 +42,12 @@ class Block:
     
     def getEpsilon(self)->float:
         return self.epsilon
+    
+    def setEpsilon(self,epsilon:float):
+        self.epsilon=epsilon
 
     def updateEpsilon(self,epsilon:float):
-        self.epsilon=np.clip(epsilon,0.0,1.0)
+        self.epsilon=np.clip(self.epsilon+epsilon,0.0,1.0)
     
     def createPopulation(self):
         '''
@@ -83,8 +86,7 @@ class Block:
     def Evaluate(self,evaluation:float):
         _evaluation=evaluation/self.batch_size
         for neuron in self.batch:
-            neuron.applyEvaluation(_evaluation)
-            neuron.UpdateQ()
+            neuron.UpdateQ(_evaluation)
             if neuron.Breedable():
                 self.number_of_breedable_neurons+=1
     
@@ -117,21 +119,27 @@ class Block:
 
             population=sorted(self.population,key=lambda x:x.Q,reverse=True)
 
-            # get 50% neurons sorted by thier Q value we are extracting the best neruons here
-            population=population[:int(self.population_size*0.5)]
+            # get 40% neurons sorted by thier Q value we are extracting the best neruons here
+            population=population[:int(self.population_size*0.4)]
 
             #print("Best neuron Q value : ",population[0].Q)
 
-            #print("Breeding")
+            print("Breeding")
 
             self.population=[]
 
+            # fill the 80% procent of population with current 40% procent of best neurons and thier childrens
+
             self.CrossoverPopulation(population)
 
-            for neuron in population:
-                self.population.append(neuron)
+            for n in population:
+                self.population.append(n)
 
-            self.MutatePopulation(self.population)
+            #self.MutatePopulation(self.population)
+            
+            # the rest of 20% procent population fill with brand new neurons
+            for i in range(int(self.population_size*0.2)):
+                self.population.append(neuron.Neuron(self.input_size,self.output_size))
 
             self.number_of_breedable_neurons=0
 
@@ -139,7 +147,7 @@ class Block:
         
         return False
     
-    def CrossoverPopulation(self,population):
+    def CrossoverPopulation(self,population:list[neuron.Neuron]):
         '''
             A function that performs crossover on neurons population.
             
