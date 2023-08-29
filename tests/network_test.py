@@ -76,9 +76,9 @@ def trendfunction(eval:float,network:network.Network)->float:
     trends.append(trend)
 
     if trend>0.0:
-        return 0.01
+        return 0.1
     elif trend<0.0:
-        return -0.01
+        return -0.1
     
     return 0.0
     
