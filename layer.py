@@ -47,12 +47,10 @@ class Layer:
 
     def fire(self,_inputs:np.ndarray)->np.ndarray:
         outputs:np.ndarray=np.zeros(self.output_size,dtype=np.float32)
-        
-        inputs=np.concatenate((_inputs,self.last_outputs))
 
         for block in self.blocks:
             block.pickBatch()
-            outputs+=block.fire(inputs)#/len(self.blocks)
+            outputs+=block.fire(_inputs)#/len(self.blocks)
 
         for n,activ in enumerate(self.activation_fun):
             outputs[n]=clip(activ(outputs[n]))
@@ -96,8 +94,6 @@ class Layer:
 
         np.save(memory,metadata)
 
-        np.save(memory,self.last_outputs)
-
         for block in self.blocks:
             block.save(memory)
 
@@ -109,8 +105,6 @@ class Layer:
 
         self.input_size=metadata[0]
         self.output_size=metadata[1]
-
-        self.last_outputs=np.load(data)
 
         self.blocks.clear()
 
@@ -143,3 +137,44 @@ class RecurrentLayer(Layer):
         self.last_outputs=np.copy(outputs)
 
         return outputs
+    
+    def save(self,memory:io.BufferedIOBase):
+        '''
+            Save each blocks
+            Activation functions list
+            Input size
+            Output size
+            Number of blocks
+            Last output
+
+            Every block will be saved in individual file
+        '''
+        metadata=np.array([self.input_size,self.output_size,len(self.blocks)],dtype=np.int32)
+
+        np.save(memory,metadata)
+
+        np.save(memory,self.last_outputs)
+
+        for block in self.blocks:
+            block.save(memory)
+
+        pkl.dump(self.activation_fun,memory)
+ 
+    def load(self,data:io.RawIOBase):
+        
+        metadata=np.load(data)
+
+        self.input_size=metadata[0]
+        self.output_size=metadata[1]
+
+        self.last_outputs=np.load(data)
+
+        self.blocks.clear()
+
+        for i in range(metadata[2]):
+            _block=block.Block(0,0,0,0)
+            _block.load(data)
+            _block.strategy=self.breed_strategy
+            self.blocks.append(_block)
+        
+        self.activation_fun=pkl.load(data)
