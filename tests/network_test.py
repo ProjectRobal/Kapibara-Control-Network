@@ -14,6 +14,8 @@ from crossover.qonepoint import QOnePoint
 
 from buffer import TrendBuffer
 
+from initializer.gaussinit import GaussInit
+
 '''
 
 Now we have problem with nan value which is solve yeah!
@@ -76,9 +78,9 @@ def trendfunction(eval:float,network:network.Network)->float:
     trends.append(trend)
 
     if trend>0.0:
-        return 0.1
+        return 1.0
     elif trend<0.0:
-        return -0.1
+        return -1.0
     
     return 0.0
     
@@ -88,8 +90,10 @@ breed_str.cross=QOnePoint
 
 network1=network.Network(6,breed_str)
 
-network1.addLayer(256,32)
-network1.addLayer(2,16)
+init=GaussInit(0.0,0.1)
+
+network1.addLayer(256,32,[],init)
+network1.addLayer(2,16,[],init)
 
 #if os.path.exists("tests/checkpoint/last.chk"):
 #    print("Loading checkpoint!!")
@@ -120,12 +124,12 @@ x=[]
 
 best_val=0
 
-for n in range(5000):
+for n in range(2000):
     start=timeit.default_timer()
 
-    output=network1.step(inputs/10000.0)
+    output=network1.step(inputs/1.0)
 
-    error=regression_test(output[0]*10000.0,output[1]*10000.0)
+    error=regression_test(output[0]*1.0,output[1]*1.0)
 
     eval=error_to_rewrd(error)
 
@@ -136,6 +140,7 @@ for n in range(5000):
     network1.evalute(eval)
 
     print("Epsilon: ",network1.getLayerBestRatioPopulation(0))
+    print("Eval: ",eval)
 
     if eval>best_val:
         best_val=eval
@@ -143,7 +148,8 @@ for n in range(5000):
         print(eval)
         network.NetworkParser.save(network1,"tests/checkpoint/best.chk")
     else:
-        print("Time: ",timeit.default_timer()-start," s")
+        #print("Time: ",timeit.default_timer()-start," s")
+        pass
 
     #print("Output reward",eval)
 

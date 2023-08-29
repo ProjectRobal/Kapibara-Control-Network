@@ -2,8 +2,11 @@ import io
 import numpy as np
 import pickle as pkl
 from base.activation import Activation
+from base.initializer import Initializer
+
 from activation.linear import Linear
 from BreedStrategy import BreedStrategy
+from initializer.uniforminit import UniformInit
 
 import block
 
@@ -13,7 +16,7 @@ class Layer:
     '''
         A class that stores blocks, it is recursive layer
     '''
-    def __init__(self,input_size:int,output_size:int,block_number:int,block_nueron_number:int=64,block_population_size:int=512,breed_strategy=BreedStrategy()) -> None:
+    def __init__(self,input_size:int,output_size:int,block_number:int,block_nueron_number:int=64,block_population_size:int=512,init:Initializer=UniformInit(),breed_strategy=BreedStrategy()) -> None:
 
         self.breed_strategy=breed_strategy
 
@@ -28,12 +31,13 @@ class Layer:
         
         self.blocks:list[block.Block]=[]
 
-        self.init_blocks(block_number,block_nueron_number,block_population_size)
+        self.init_blocks(block_number,block_nueron_number,block_population_size,init)
     
-    def init_blocks(self,block_number:int,block_nueron_number:int,block_population_size:int):
+    def init_blocks(self,block_number:int,block_nueron_number:int,block_population_size:int,init:Initializer):
         
         for n in range(block_number):
             _block=block.Block(self.input_size,self.output_size,block_nueron_number,block_population_size,self.breed_strategy)
+            _block.setInitializer(init)
             _block.createPopulation()
             self.blocks.append(_block)
 
@@ -45,6 +49,8 @@ class Layer:
 
     def fire(self,_inputs:np.ndarray)->np.ndarray:
         outputs:np.ndarray=np.zeros(self.output_size,dtype=np.float32)
+
+        self.last_outputs=np.zeros(self.output_size)
         
         inputs=np.concatenate((_inputs,self.last_outputs))
 

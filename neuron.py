@@ -5,9 +5,10 @@ import config
 
 from util import clip
 
+from base.initializer import Initializer
 
 class Neuron:
-    def __init__(self,input_size:int,output_size:int):
+    def __init__(self,input_size:int,output_size:int,init:Initializer=None):
         '''
         input_size - a size of input weights
         output_size - a size of output weights
@@ -16,8 +17,10 @@ class Neuron:
         '''
         # additional weight for past output, used for recurrsion
         # initial random weights
-        self.input_weights=np.random.normal(0,1,input_size)
-        self.output_weights=np.random.normal(0,1,output_size)
+        if init is not None:
+            self.input_weights=init.init(input_size)
+            self.output_weights=init.init(output_size)
+        
         self.state:float=0.0
         self.dot_product=config.DOT_PRODUCT
         # count in how many trials neuron has particpated
@@ -46,9 +49,9 @@ class Neuron:
         self.state=0.0
         self.trails=0.0
 
-    def reinitialize(self):
-        self.input_weights=np.random.normal(0,1,self.input_size())
-        self.output_weights=np.random.normal(0,1,self.output_size())
+    def reinitialize(self,init:Initializer):
+        self.input_weights=init.init(self.input_size())
+        self.output_weights=init.init(self.output_size())
     
     def Breedable(self)->bool:
         '''
@@ -59,6 +62,7 @@ class Neuron:
     def UpdateQ(self,eval:float):
         self.Q=clip(eval+config.LEARING_RATE*self.Q)
         self.trails+=1
+        self.trails=clip(self.trails)
 
     def dump(self)->bytearray:
         '''
