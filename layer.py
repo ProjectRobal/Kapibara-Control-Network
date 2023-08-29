@@ -21,10 +21,8 @@ class Layer:
         self.breed_strategy=breed_strategy
 
         # it gets outputs from last step
-        self.input_size=input_size+output_size
+        self.input_size=input_size
         self.output_size=output_size
-
-        self.last_outputs=np.zeros(self.output_size)
 
         # output activation function
         self.activation_fun:list[Activation]=[Linear]*self.output_size
@@ -49,8 +47,6 @@ class Layer:
 
     def fire(self,_inputs:np.ndarray)->np.ndarray:
         outputs:np.ndarray=np.zeros(self.output_size,dtype=np.float32)
-
-        self.last_outputs=np.zeros(self.output_size)
         
         inputs=np.concatenate((_inputs,self.last_outputs))
 
@@ -60,8 +56,6 @@ class Layer:
 
         for n,activ in enumerate(self.activation_fun):
             outputs[n]=clip(activ(outputs[n]))
-
-        self.last_outputs=np.copy(outputs)
 
         return outputs
 
@@ -127,3 +121,25 @@ class Layer:
             self.blocks.append(_block)
         
         self.activation_fun=pkl.load(data)
+
+class RecurrentLayer(Layer):
+    def __init__(self,input_size:int,output_size:int,block_number:int,block_nueron_number:int=64,block_population_size:int=512,init:Initializer=UniformInit(),breed_strategy=BreedStrategy()) -> None:
+        super(RecurrentLayer,self).__init__(input_size+output_size,output_size,block_number,block_nueron_number,block_population_size,init,breed_strategy)
+
+        self.last_outputs=np.zeros(output_size,dtype=np.float32)
+
+    def fire(self,_inputs:np.ndarray)->np.ndarray:
+        outputs:np.ndarray=np.zeros(self.output_size,dtype=np.float32)
+        
+        inputs=np.concatenate((_inputs,self.last_outputs))
+
+        for block in self.blocks:
+            block.pickBatch()
+            outputs+=block.fire(inputs)#/len(self.blocks)
+
+        for n,activ in enumerate(self.activation_fun):
+            outputs[n]=clip(activ(outputs[n]))
+
+        self.last_outputs=np.copy(outputs)
+
+        return outputs
