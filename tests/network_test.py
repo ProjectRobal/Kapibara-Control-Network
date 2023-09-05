@@ -95,9 +95,9 @@ init=GaussInit(0.0,0.1)
 network1.addLayer(256,32,[],init)
 network1.addLayer(2,16,[],init)
 
-#if os.path.exists("tests/checkpoint/last.chk"):
-#    print("Loading checkpoint!!")
-#    network1=network.NetworkParser.load("tests/checkpoint/last.chk")
+if os.path.exists("tests/checkpoint/last.chk"):
+    print("Loading checkpoint!!")
+    network1=network.NetworkParser.load("tests/checkpoint/last.chk")
 
 network1.setTrendFunction(trendfunction)
 
@@ -124,7 +124,7 @@ x=[]
 
 best_val=0
 
-for n in range(2000):
+for n in range(20):
     start=timeit.default_timer()
 
     output=network1.step(inputs/1.0)

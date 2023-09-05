@@ -107,7 +107,7 @@ class Neuron:
         output_neurons=np.load(inputs)
 
         self.trails=metadata[0]
-        #self.Q=metadata[1]
+        self.Q=metadata[1]
         self.input_weights=input_neurons
         self.output_weights=output_neurons
 

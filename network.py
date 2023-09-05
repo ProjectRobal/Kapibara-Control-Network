@@ -134,7 +134,7 @@ class NetworkParser:
             network.breed_strategy=pkl.load(file)
 
             for i in range(metadata[1]):
-                type:int=np.load(metadata)[0]
+                type:int=np.load(file)[0]
 
                 layer_t=layer.LAYERS_TYPES_ID[type]
 
