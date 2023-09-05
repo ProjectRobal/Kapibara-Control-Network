@@ -3,6 +3,8 @@ import random
 import numpy as np
 from BreedStrategy import BreedStrategy
 import neuron
+from base.initializer import Initializer
+from initializer.uniforminit import UniformInit
 
 import itertools as it
 import collections as ct
@@ -30,12 +32,28 @@ class Block:
 
         self.strategy=strategy
 
+        # ratio between amount of best neurons and population size
+        self.epsilon:float=0.0
+
         # an entire population of neurons
         self.population:list[neuron.Neuron]=[]
 
         # a couple of neurons picked for partipication
         self.batch:list[neuron.Neuron]=[]
 
+        self.init:Initializer=UniformInit()
+
+    def setInitializer(self,init:Initializer):
+        self.init=init
+
+    def getEpsilon(self)->float:
+        return self.epsilon
+    
+    def setEpsilon(self,epsilon:float):
+        self.epsilon=epsilon
+
+    def updateEpsilon(self,epsilon:float):
+        self.epsilon=np.clip(self.epsilon+epsilon,0.0,1.0)
     
     def createPopulation(self):
         '''
@@ -43,21 +61,41 @@ class Block:
         '''
 
         for i in range(self.population_size):
-            self.population.append(neuron.Neuron(self.input_size,self.output_size))
+            self.population.append(neuron.Neuron(self.input_size,self.output_size,self.init))
+
+    def clearPopulation(self):
+        self.population.clear()
 
     def PopulationSize(self)->int:
         return len(self.population)
+    
+    def choice(self,population:list[neuron.Neuron],batch_size:int)->list[neuron.Neuron]:
+        # sort it
+        population=sorted(population,key=lambda x:x.Q,reverse=True)
+
+        batch:list[neuron.Neuron]=[]
+        
+        batch.extend(population[:int(self.epsilon*batch_size)])
+
+        batch_space_left:int=batch_size-int(self.epsilon*batch_size)
+
+        if batch_space_left>0:
+            batch.extend(random.sample(population[int(self.epsilon*batch_size):],batch_space_left))
+
+        return batch
     
     def pickBatch(self):
         '''
             A function that take random neurons from population to create batch of active neurons
         '''
-        self.batch=random.sample(self.population,self.batch_size)
+
+        self.batch=self.choice(self.population,self.batch_size)
+        #print("The best neuron Q: ",self.batch[0].Qvalue())
 
     def Evaluate(self,evaluation:float):
         _evaluation=evaluation/self.batch_size
         for neuron in self.batch:
-            neuron.applyEvaluation(_evaluation)
+            neuron.UpdateQ(_evaluation)
             if neuron.Breedable():
                 self.number_of_breedable_neurons+=1
     
@@ -73,9 +111,9 @@ class Block:
         return clip(output)        
     
     def ReadyForMating(self)->bool:
-        return self.number_of_breedable_neurons>=self.population_size
+        return self.number_of_breedable_neurons>=self.population_size*config.MATING_TRESHOLD
     
-    def Mating(self)->bool:
+    def Mating(self):
         '''
             A function that performs crossover and mutation on population.
             A function is called when at least d members of population has performed p times.
@@ -86,32 +124,35 @@ class Block:
         '''
 
         # check if population is ready
-        if self.ReadyForMating():
 
-            population=sorted(self.population,key=lambda x:x.evaluation,reverse=True)
+        population=sorted(self.population,key=lambda x:x.Q,reverse=True)
 
-            population=population[:int(self.population_size*0.5)]
+        # get 40% neurons sorted by thier Q value we are extracting the best neruons here
+        population=population[:int(self.population_size*0.4)]
 
-            #print("Best neuron eval: ",population[0].evaluation)
+        #print("Best neuron Q value : ",population[0].Q)
 
-            #print("Breeding")
+        #print("Breeding")
 
-            self.population=[]
+        self.population=[]
 
-            self.CrossoverPopulation(population)
+        # fill the 80% procent of population with current 40% procent of best neurons and thier childrens
 
-            for neuron in population:
-                self.population.append(neuron)
+        self.population.extend(population)
 
-            self.MutatePopulation(self.population)
+        self.CrossoverPopulation(population)
 
-            self.number_of_breedable_neurons=0
+        # mutate half of childrens
 
-            return True
-        
-        return False
+        self.MutatePopulation(self.population[int(len(self.population)/2):])
+            
+        # the rest of 20% procent population fill with brand new neurons
+        for i in range(int(self.population_size*0.2)):
+            self.population.append(neuron.Neuron(self.input_size,self.output_size,self.init))
+
+        self.number_of_breedable_neurons=0
     
-    def CrossoverPopulation(self,population):
+    def CrossoverPopulation(self,population:list[neuron.Neuron]):
         '''
             A function that performs crossover on neurons population.
             
@@ -145,7 +186,7 @@ class Block:
         Save population size
         Save number_of_breedable_neurons
         '''
-        metadata=np.array([self.population_size,self.input_size,self.output_size,self.batch_size,self.number_of_breedable_neurons],dtype=np.int32)
+        metadata=np.array([self.population_size,self.input_size,self.output_size,self.batch_size,self.number_of_breedable_neurons,self.epsilon],dtype=np.int32)
 
         np.save(memory,metadata)
 
@@ -167,6 +208,7 @@ class Block:
         self.output_size=metadata[2]
         self.batch_size=metadata[3]
         self.number_of_breedable_neurons=metadata[4]
+        self.epsilon=metadata[5]
 
         self.population.clear()
         self.batch.clear()

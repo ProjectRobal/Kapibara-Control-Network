@@ -5,9 +5,10 @@ import config
 
 from util import clip
 
+from base.initializer import Initializer
 
 class Neuron:
-    def __init__(self,input_size:int,output_size:int):
+    def __init__(self,input_size:int,output_size:int,init:Initializer=None):
         '''
         input_size - a size of input weights
         output_size - a size of output weights
@@ -16,8 +17,10 @@ class Neuron:
         '''
         # additional weight for past output, used for recurrsion
         # initial random weights
-        self.input_weights=(np.random.random(input_size)-0.5)*10
-        self.output_weights=(np.random.random(output_size)-0.5)*10
+        if init is not None:
+            self.input_weights=init.init(input_size)
+            self.output_weights=init.init(output_size)
+        
         self.state:float=0.0
         self.dot_product=config.DOT_PRODUCT
         # count in how many trials neuron has particpated
@@ -25,13 +28,16 @@ class Neuron:
 
         # evaluation of neuron used for crossover and mutation 
         self.evaluation:float=0.0
+        self.Q:float=0.0
 
     def fire(self,inputs:np.ndarray)->np.ndarray:
 
         self.state=self.dot_product(self.input_weights,inputs)
 
         return clip(self.output_weights*self.state)
-
+    
+    def Qvalue(self)->float:
+        return self.Q
 
     def input_size(self)->int:
         return len(self.input_weights)
@@ -40,34 +46,23 @@ class Neuron:
         return len(self.output_weights)
 
     def reset(self):
-
         self.state=0.0
-        self.evaluation=0.0
         self.trails=0.0
 
-    def reinitialize(self):
-        self.input_weights=(np.random.random(self.input_size())-0.5)
-        self.output_weights=(np.random.random(self.output_size())-0.5)
-
-    def setEvaluation(self,eval:float):
-        self.evaluation=eval
-
-    def applyEvaluation(self,eval:float):
-        self.evaluation+=eval
-        self.trails+=1
-
-    def getEvaluation(self)->float:
-        return self.evaluation
+    def reinitialize(self,init:Initializer):
+        self.input_weights=init.init(self.input_size())
+        self.output_weights=init.init(self.output_size())
     
     def Breedable(self)->bool:
         '''
             Whether the neuron is ready for breeding
         '''
-        if self.trails>=config.NUMBER_OF_TRIALS:
-            self.trails=0
-            return True
-        
-        return False
+        return self.trails==config.NUMBER_OF_TRIALS
+    
+    def UpdateQ(self,eval:float):
+        self.Q=clip(eval+config.LEARING_RATE*self.Q)
+        self.trails+=1
+        self.trails=clip(self.trails)
 
     def dump(self)->bytearray:
         '''
@@ -81,7 +76,7 @@ class Neuron:
         output_neurons=io.BytesIO()
         metadata=io.BytesIO()
 
-        neuron_metadata=np.array([self.trails],dtype=np.int32)
+        neuron_metadata=np.array([self.trails,self.Q],dtype=np.int32)
 
         np.save(metadata,neuron_metadata)
         np.save(input_neurons,self.input_weights)
@@ -112,7 +107,7 @@ class Neuron:
         output_neurons=np.load(inputs)
 
         self.trails=metadata[0]
-
+        self.Q=metadata[1]
         self.input_weights=input_neurons
         self.output_weights=output_neurons
 
