@@ -1,16 +1,22 @@
+from typing import Callable
 import io
 import numpy as np
 import pickle as pkl
 
 from base.activation import Activation
+from base.initializer import Initializer
+
 from activation.linear import Linear
 
 from BreedStrategy import BreedStrategy
+from initializer.uniforminit import UniformInit
 
 import layer
-    
+
+TrendFunction=Callable[[float,object],float]
 
 class Network:
+    
     '''
         A class that defines network.
         It stores layers wich defines hidden layers of network.
@@ -24,7 +30,24 @@ class Network:
         # copy of best performed layer
         self.best_layer:list[layer.Layer]=[]
 
-    def addLayer(self,output_size:int,block_number:int,activation:list[Activation]=[],block_params:tuple[int,int]=(16,512)):
+        self.trend_function:TrendFunction=None
+
+    def setTrendFunction(self,trend_function:TrendFunction):
+        self.trend_function=trend_function
+
+    def resetPopulation(self):
+        for layer in self.layers:
+            pass
+    
+    def getLayerBestRatioPopulation(self,id:int)->float:
+
+        if id>=len(self.layers) or id<0:
+            id=0
+
+        return self.layers[id].getBestRatioPopulation()
+
+
+    def addLayer(self,output_size:int,block_number:int,activation:list[Activation]=[],init:Initializer=UniformInit(),block_params:tuple[int,int]=(16,512)):
         '''
             High level function to add layer to network
         '''
@@ -36,7 +59,7 @@ class Network:
         else:
             input_size=self.layers[-1].output_size
 
-        _layer=layer.Layer(input_size,output_size,block_number,block_params[0],block_params[1],self.breed_strategy)
+        _layer=layer.Layer(input_size,output_size,block_number,block_params[0],block_params[1],init,self.breed_strategy)
 
         _layer.setActivationFun(activation)
 
@@ -67,6 +90,12 @@ class Network:
         return output
     
     def evalute(self,eval:float):
+
+        if self.trend_function is not None:
+            dpopulation=self.trend_function(eval,self)
+            for l in self.layers:
+                l.changeBestRatioPopulation(dpopulation)
+        
         eval=eval/len(self.layers)
 
         for l in self.layers:
@@ -105,7 +134,11 @@ class NetworkParser:
             network.breed_strategy=pkl.load(file)
 
             for i in range(metadata[1]):
-                _layer=layer.Layer(0,0,0,0,0)
+                type:int=np.load(file)[0]
+
+                layer_t=layer.LAYERS_TYPES_ID[type]
+
+                _layer=layer_t(0,0,0,0,0)
                 _layer.breed_strategy=network.breed_strategy
 
                 _layer.load(file)

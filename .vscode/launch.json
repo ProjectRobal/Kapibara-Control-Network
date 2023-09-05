@@ -9,7 +9,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "module":"tests.layer_test",
+            "module":"tests.network_test",
             "console": "integratedTerminal",
             "cwd":"${workspaceFolder}",
             "justMyCode": false
