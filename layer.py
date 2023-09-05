@@ -18,6 +18,7 @@ class Layer:
     '''
     def __init__(self,input_size:int,output_size:int,block_number:int,block_nueron_number:int=64,block_population_size:int=512,init:Initializer=UniformInit(),breed_strategy=BreedStrategy()) -> None:
 
+
         self.breed_strategy=breed_strategy
 
         # it gets outputs from last step
@@ -44,6 +45,11 @@ class Layer:
             raise ValueError("Activation function list doesn't have required size")
 
         self.activation_fun=activ_fun
+
+    def reset(self):
+        for block in self.blocks:
+            block.clearPopulation()
+            block.clearPopulation()
 
     def fire(self,_inputs:np.ndarray)->np.ndarray:
         outputs:np.ndarray=np.zeros(self.output_size,dtype=np.float32)
@@ -90,6 +96,11 @@ class Layer:
 
             Every block will be saved in individual file
         '''
+
+        # layer type 0x01 is recurrent type
+
+        np.save(memory,np.array([0x01],dtype=np.int16))
+
         metadata=np.array([self.input_size,self.output_size,len(self.blocks)],dtype=np.int32)
 
         np.save(memory,metadata)
@@ -149,6 +160,10 @@ class RecurrentLayer(Layer):
 
             Every block will be saved in individual file
         '''
+        # layer type 0x00 is recurrent type
+
+        np.save(memory,np.array([0x00],dtype=np.int16))
+
         metadata=np.array([self.input_size,self.output_size,len(self.blocks)],dtype=np.int32)
 
         np.save(memory,metadata)
@@ -178,3 +193,9 @@ class RecurrentLayer(Layer):
             self.blocks.append(_block)
         
         self.activation_fun=pkl.load(data)
+
+
+LAYERS_TYPES_ID={
+    0x00:RecurrentLayer,
+    0x01:Layer
+}

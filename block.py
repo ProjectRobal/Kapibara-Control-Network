@@ -63,6 +63,9 @@ class Block:
         for i in range(self.population_size):
             self.population.append(neuron.Neuron(self.input_size,self.output_size,self.init))
 
+    def clearPopulation(self):
+        self.population.clear()
+
     def PopulationSize(self)->int:
         return len(self.population)
     

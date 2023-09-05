@@ -35,6 +35,9 @@ class Network:
     def setTrendFunction(self,trend_function:TrendFunction):
         self.trend_function=trend_function
 
+    def resetPopulation(self):
+        for layer in self.layers:
+            pass
     
     def getLayerBestRatioPopulation(self,id:int)->float:
 
@@ -131,7 +134,11 @@ class NetworkParser:
             network.breed_strategy=pkl.load(file)
 
             for i in range(metadata[1]):
-                _layer=layer.Layer(0,0,0,0,0)
+                type:int=np.load(metadata)[0]
+
+                layer_t=layer.LAYERS_TYPES_ID[type]
+
+                _layer=layer_t(0,0,0,0,0)
                 _layer.breed_strategy=network.breed_strategy
 
                 _layer.load(file)
