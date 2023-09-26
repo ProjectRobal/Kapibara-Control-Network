@@ -14,6 +14,7 @@ import more_itertools as mit
 import config
 
 from util import clip
+import time
 
 
 class Block:
@@ -53,7 +54,7 @@ class Block:
         self.epsilon=epsilon
 
     def updateEpsilon(self,epsilon:float):
-        self.epsilon=np.clip(self.epsilon+epsilon,0.0,1.0)
+        self.epsilon=np.clip(epsilon,config.MIN_EPSILON,1.0)
     
     def createPopulation(self):
         '''
@@ -132,7 +133,7 @@ class Block:
 
         #print("Best neuron Q value : ",population[0].Q)
 
-        #print("Breeding")
+        print("Breeding ",time.strftime("%H:%M:%S"))
 
         self.population=[]
 

@@ -47,7 +47,7 @@ class Network:
         return self.layers[id].getBestRatioPopulation()
 
 
-    def addLayer(self,output_size:int,block_number:int,activation:list[Activation]=[],init:Initializer=UniformInit(),block_params:tuple[int,int]=(16,512)):
+    def addLayer(self,output_size:int,block_number:int,layer_type=layer.Layer,activation:list[Activation]=[],init:Initializer=UniformInit(),block_params:tuple[int,int]=(16,512)):
         '''
             High level function to add layer to network
         '''
@@ -59,7 +59,7 @@ class Network:
         else:
             input_size=self.layers[-1].output_size
 
-        _layer=layer.Layer(input_size,output_size,block_number,block_params[0],block_params[1],init,self.breed_strategy)
+        _layer=layer_type(input_size,output_size,block_number,block_params[0],block_params[1],init,self.breed_strategy)
 
         _layer.setActivationFun(activation)
 
@@ -69,7 +69,7 @@ class Network:
         '''
             Low level function to add layer to network
         '''
-        if type(layers) is layer.Layer:
+        if isinstance(layers,layer.Layer):
             self.layers.append(layers)
             return
 

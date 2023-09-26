@@ -10,12 +10,13 @@ import neuron
 from base.crossover import Crossover
 from base.mutation import Mutation
 
-from crossover.onepoint import OnePoint
+#from crossover.onepoint import OnePoint
+from crossover.qonepoint import QOnePoint
 from mutation.gaussmutation import GaussMutaion
 
 
 class BreedStrategy:
-    def __init__(self,cross:Crossover=OnePoint,mutate:Mutation=GaussMutaion):
+    def __init__(self,cross:Crossover=QOnePoint,mutate:Mutation=GaussMutaion):
         self.cross=cross
         self.mutate=mutate
 
