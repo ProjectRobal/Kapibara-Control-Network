@@ -147,7 +147,7 @@ class Block:
 
         population=sorted(population,key=lambda x:x.Q,reverse=True)
 
-        self.MutatePopulation(self.population[:int(len(self.population)*config.LEAST_NEURONS_K)])
+        self.MutatePopulation(self.population[int(len(self.population)*(1.0-config.LEAST_NEURONS_K)):])
             
         # the rest of 20% procent population fill with brand new neurons
         for i in range(int(self.population_size*(1.0-config.BEST_NEURONS*2))):

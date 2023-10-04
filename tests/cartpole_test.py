@@ -17,6 +17,8 @@ from layer import RecurrentLayer,Layer
 from BreedStrategy import BreedStrategy
 
 from activation.sigmoid import Sigmoid
+from activation.linear import Linear
+from activation.relu import Relu
 from initializer.gaussinit import GaussInit
 
 from buffer import TrendBuffer
@@ -25,15 +27,15 @@ import matplotlib.pyplot as pyplot
 
 env=gymnasium.make("CartPole-v1",render_mode="human")
 
-init=GaussInit(0,0.01)
+init=GaussInit(0,0.1)
 
 network1=Network(2)
 
-network1.addLayer(2,8,Layer,[Sigmoid,Sigmoid],init,(8,64))
+network1.addLayer(2,4,RecurrentLayer,[Relu,Relu],init,(8,64))
 
 evaluation_trend:TrendBuffer=TrendBuffer(20)
 
-epsilon=0.1
+epsilon=0.5
 
 trends:float=[]
 
@@ -49,7 +51,9 @@ def trendfunction(eval:float,network:Network)->float:
 
     evaluation_trend.push(eval)
 
-    _epsilon=np.exp(2.3*(eval/500))*0.1
+    #_epsilon=np.exp(2.3*(eval/500))*0.1
+
+    _epsilon=eval/200
 
     if eval>best_eval:
         best_eval=eval
@@ -106,8 +110,8 @@ while True:
         steps=0
 
         while not terminated:
-
-            action:int=np.argmax(network1.run([state[0],state[2]]))
+            output=network1.run([state[0],state[2]])
+            action:int=np.argmax(output)
 
             state,reward,terminated,truncated,info=env.step(action)
 

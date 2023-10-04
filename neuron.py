@@ -35,7 +35,7 @@ class Neuron:
 
         self.state=self.dot_product(self.input_weights,inputs)
 
-        return clip(self.output_weights*self.state + self.output_bias)
+        return clip(self.output_weights*self.state)
     
     def Qvalue(self)->float:
         return self.Q

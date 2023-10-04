@@ -12,7 +12,7 @@ BEST_NEURONS=0.25
 MIN_EPSILON=0.1
 
 # percentage of least performed neurons in block that will be mutated
-LEAST_NEURONS_K=0.5
+LEAST_NEURONS_K=0.9
 
 # a precentage number of amount of population that took required number of actions in block, required for mating to occur
 MATING_TRESHOLD=0.25

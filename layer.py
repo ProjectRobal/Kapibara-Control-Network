@@ -149,6 +149,21 @@ class RecurrentLayer(Layer):
 
         self.last_outputs=np.zeros(output_size,dtype=np.float32)
 
+    def step(self,_inputs:np.ndarray)->np.ndarray:
+        outputs:np.ndarray=np.zeros(self.output_size,dtype=np.float32)
+        
+        inputs=np.concatenate((_inputs,self.last_outputs))
+
+        for block in self.blocks:
+            outputs+=block.fire(inputs)#/len(self.blocks)
+
+        for n,activ in enumerate(self.activation_fun):
+            outputs[n]=clip(activ(outputs[n]))
+
+        self.last_outputs=np.copy(outputs)
+
+        return outputs    
+
     def fire(self,_inputs:np.ndarray)->np.ndarray:
         outputs:np.ndarray=np.zeros(self.output_size,dtype=np.float32)
         
