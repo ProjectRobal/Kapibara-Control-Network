@@ -34,7 +34,7 @@ class Block:
         self.strategy=strategy
 
         # ratio between amount of best neurons and population size
-        self.epsilon:float=0.0
+        self.epsilon:float=config.MIN_EPSILON
 
         # an entire population of neurons
         self.population:list[neuron.Neuron]=[]
@@ -128,8 +128,8 @@ class Block:
 
         population=sorted(self.population,key=lambda x:x.Q,reverse=True)
 
-        # get 40% neurons sorted by thier Q value we are extracting the best neruons here
-        population=population[:int(self.population_size*0.4)]
+        # get BEST_NEURONS% neurons sorted by thier Q value we are extracting the best neruons here
+        population=population[:int(self.population_size*config.BEST_NEURONS)]
 
         #print("Best neuron Q value : ",population[0].Q)
 
@@ -137,7 +137,7 @@ class Block:
 
         self.population=[]
 
-        # fill the 80% procent of population with current 40% procent of best neurons and thier childrens
+        # fill the 2*BEST_NEURONS% procent of population with current BEST_NEURONS% procent of best neurons and thier childrens
 
         self.population.extend(population)
 
@@ -145,11 +145,15 @@ class Block:
 
         # mutate half of childrens
 
-        self.MutatePopulation(self.population[int(len(self.population)/2):])
+        population=sorted(population,key=lambda x:x.Q,reverse=True)
+
+        self.MutatePopulation(self.population[:int(len(self.population)*config.LEAST_NEURONS_K)])
             
         # the rest of 20% procent population fill with brand new neurons
-        for i in range(int(self.population_size*0.2)):
-            self.population.append(neuron.Neuron(self.input_size,self.output_size,self.init))
+        for i in range(int(self.population_size*(1.0-config.BEST_NEURONS*2))):
+            n=neuron.Neuron(self.input_size,self.output_size,self.init)
+            n.Q=np.random.random()*self.population[0].Q
+            self.population.append(n)
 
         self.number_of_breedable_neurons=0
     
@@ -174,7 +178,6 @@ class Block:
         '''
             A function that performs mutation on neurons population.
         '''
-
         for neuron in population:
             self.strategy.mutation(neuron)
 

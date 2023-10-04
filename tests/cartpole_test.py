@@ -1,9 +1,19 @@
+'''
+Notes:
+
+Instead of using equation Q(t)=Q(t-1)+alfa*R(t) use 
+Q(t)=Q(t-1)+alfa*d(R(t)/Q(t-1))*R(t)
+
+Where d is function that is near 0 when (Q(t) / Q(t-1)) is less than 1.0.
+
+'''
+
 import os
 import numpy as np
 import gymnasium
 
 from network import Network,NetworkParser
-from layer import RecurrentLayer
+from layer import RecurrentLayer,Layer
 from BreedStrategy import BreedStrategy
 
 from activation.sigmoid import Sigmoid
@@ -19,26 +29,35 @@ init=GaussInit(0,0.01)
 
 network1=Network(2)
 
-network1.addLayer(2,8,RecurrentLayer,[Sigmoid,Sigmoid],init)
+network1.addLayer(2,8,Layer,[Sigmoid,Sigmoid],init,(8,64))
 
 evaluation_trend:TrendBuffer=TrendBuffer(20)
 
-epsilon=0.4
+epsilon=0.1
 
 trends:float=[]
+
+best_eval=0
 
 def trendfunction(eval:float,network:Network)->float:
 
     trend:float=evaluation_trend.trendline()
-    trends.append(trend)
     global epsilon
+    global best_eval
+
+    #print("Trend: ",trend)
 
     evaluation_trend.push(eval)
 
-    print("Trend: ",trend)
+    _epsilon=np.exp(2.3*(eval/500))*0.1
 
-    if eval>40:
-        epsilon=1.0
+    if eval>best_eval:
+        best_eval=eval
+        print("Best current evaluation: ",best_eval)
+
+    if _epsilon>epsilon:
+        print("New epsilon:",_epsilon)
+        epsilon=_epsilon
  
     return epsilon
 
@@ -78,23 +97,38 @@ while True:
 
     steps=0
 
-    while not terminated:
+    steps_list:list[float]=[]
 
-        action:int=np.argmax(network1.step([state[0],state[2]]))
+    network1.shuttle()
 
-        state,reward,terminated,truncated,info=env.step(action)
+    for i in range(1):
 
-        steps+=1
+        steps=0
 
-    print("Episode: ",episode, "finished with ",steps," steps")
+        while not terminated:
 
-    (state,_)=env.reset()
+            action:int=np.argmax(network1.run([state[0],state[2]]))
 
-    rewards.append(steps)
+            state,reward,terminated,truncated,info=env.step(action)
 
-    network1.evalute(steps)
-    print("Reward: ",steps)
-    print("Epsilon: ",network1.layers[0].blocks[0].epsilon)
+            steps+=1
+
+        terminated=False
+        (state,_)=env.reset()
+        
+        steps_list.append(steps)
+
+    evaluation=np.mean(steps_list)
+
+    steps_list.clear()
+
+    #print("Episode: ",episode, "finished with average ",evaluation," steps")
+
+    rewards.append(evaluation)
+
+    network1.evalute(evaluation)
+    #print("Reward: ",evaluation)
+    #print("Epsilon: ",network1.layers[0].blocks[0].epsilon)
 
     #if steps > best_score:
     #    best_score=steps

@@ -17,4 +17,12 @@ class TrendBuffer:
         output=np.polyfit(self.timeseries,self.buffer,1)
         
         return output[0]
+    
+    def stdev(self)->float:
+        
+        return np.std(self.buffer)
+    
+    def mean(self)->float:
+
+        return np.mean(self.buffer)
 

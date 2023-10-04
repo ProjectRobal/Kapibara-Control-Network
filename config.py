@@ -7,24 +7,21 @@ from dotproducts.dotnumpy import NumpyDotProduct
 
 
 # percentage of best neuron to keep in population without any crossover
-BEST_NEURONS=0.05
+BEST_NEURONS=0.25
 
 MIN_EPSILON=0.1
 
 # percentage of least performed neurons in block that will be mutated
-LEAST_NEURONS_K=0.6
-
-# percentage of least peroformed neurons in block that will lost and replaced by new ones
-NUERONS_TO_REMOVE=0.25
+LEAST_NEURONS_K=0.5
 
 # a precentage number of amount of population that took required number of actions in block, required for mating to occur
-MATING_TRESHOLD=0.1
+MATING_TRESHOLD=0.25
 
 # a number of trials nueron has to take before mating
-NUMBER_OF_TRIALS=10
+NUMBER_OF_TRIALS=5
 
 # a learing rate used for Q value update
-LEARING_RATE=0.4
+LEARING_RATE=0.8
 
 
 # a dot product a method that will be used in program

@@ -25,6 +25,7 @@ class QOnePoint(Crossover):
 
         out.input_weights=QOnePoint.cross_numpy(neuron1.input_weights,neuron2.input_weights)
         out.output_weights=QOnePoint.cross_numpy(neuron1.output_weights,neuron2.output_weights)
+        out.output_bias=QOnePoint.cross_numpy(neuron1.output_bias,neuron1.output_bias)
 
         out.Q=(neuron1.Q+neuron2.Q)/2.0
 

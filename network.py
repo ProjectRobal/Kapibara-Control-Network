@@ -76,7 +76,33 @@ class Network:
         for l in layers:
             self.layers.append(l)
 
+    def shuttle(self):
+        '''
+        Pick a new batch in layers
+        '''
+        for l in self.layers:
+            l.pickNBatch()
+
+    def run(self,inputs:np.ndarray)->np.ndarray:
+        '''
+        Run without picking new batch
+        '''
+        
+        for l in self.layers:
+            output=l.step(inputs)
+
+            inputs=output
+
+        for l in self.layers:
+
+            l.mate()
+
+        return output
+
     def step(self,inputs:np.ndarray)->np.ndarray:
+        '''
+        Run with picking new batch
+        '''
         
         for l in self.layers:
             output=l.fire(inputs)

@@ -51,11 +51,27 @@ class Layer:
             block.clearPopulation()
             block.clearPopulation()
 
+    def pickNBatch(self):
+        for block in self.blocks:
+            block.pickBatch()
+
     def fire(self,_inputs:np.ndarray)->np.ndarray:
         outputs:np.ndarray=np.zeros(self.output_size,dtype=np.float32)
 
         for block in self.blocks:
             block.pickBatch()
+            outputs+=block.fire(_inputs)#/len(self.blocks)
+
+        for n,activ in enumerate(self.activation_fun):
+            outputs[n]=clip(activ(outputs[n]))
+
+        return outputs
+    
+    def step(self,_inputs:np.ndarray)->np.ndarray:
+        outputs:np.ndarray=np.zeros(self.output_size,dtype=np.float32)
+
+        for block in self.blocks:
+            #block.pickBatch()
             outputs+=block.fire(_inputs)#/len(self.blocks)
 
         for n,activ in enumerate(self.activation_fun):

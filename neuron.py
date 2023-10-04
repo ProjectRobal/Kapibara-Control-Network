@@ -20,6 +20,7 @@ class Neuron:
         if init is not None:
             self.input_weights=init.init(input_size)
             self.output_weights=init.init(output_size)
+            self.output_bias=init.init(output_size)
         
         self.state:float=0.0
         self.dot_product=config.DOT_PRODUCT
@@ -34,7 +35,7 @@ class Neuron:
 
         self.state=self.dot_product(self.input_weights,inputs)
 
-        return clip(self.output_weights*self.state)
+        return clip(self.output_weights*self.state + self.output_bias)
     
     def Qvalue(self)->float:
         return self.Q
@@ -52,6 +53,7 @@ class Neuron:
     def reinitialize(self,init:Initializer):
         self.input_weights=init.init(self.input_size())
         self.output_weights=init.init(self.output_size())
+        self.output_bias=init.init(self.output_size())
     
     def Breedable(self)->bool:
         '''
@@ -59,8 +61,12 @@ class Neuron:
         '''
         return self.trails==config.NUMBER_OF_TRIALS
     
+    def Dumper(self,eval:float)->float:
+        return 2*((1/(np.exp(-10*eval/(self.Q+0.00000000000001))+1)) - 0.5)
+    
     def UpdateQ(self,eval:float):
-        self.Q=clip(eval+config.LEARING_RATE*self.Q)
+        self.Q=clip(self.Q+config.LEARING_RATE*eval)
+
         self.trails+=1
         self.trails=clip(self.trails)
 
