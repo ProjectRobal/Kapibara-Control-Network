@@ -53,7 +53,7 @@ def trendfunction(eval:float,network:Network)->float:
 
     #_epsilon=np.exp(2.3*(eval/500))*0.1
 
-    _epsilon=eval/200
+    _epsilon=eval/500
 
     if eval>best_eval:
         best_eval=eval
