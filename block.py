@@ -42,6 +42,10 @@ class Block:
         # a couple of neurons picked for partipication
         self.batch:list[neuron.Neuron]=[]
 
+        # a best batch of neurons
+        self.best_batch:list[neuron.Neuron]=[]
+        self.best_eval=0.0
+
         self.init:Initializer=UniformInit()
 
     def setInitializer(self,init:Initializer):
@@ -71,14 +75,15 @@ class Block:
         return len(self.population)
     
     def choice(self,population:list[neuron.Neuron],batch_size:int)->list[neuron.Neuron]:
-        # sort it
-        population=sorted(population,key=lambda x:x.Q,reverse=True)
-
+        
         batch:list[neuron.Neuron]=[]
         
-        batch.extend(population[:int(self.epsilon*batch_size)])
+        if len(self.best_batch)>0:
+            batch.extend(self.best_batch[:int(self.epsilon*batch_size)])
 
-        batch_space_left:int=batch_size-int(self.epsilon*batch_size)
+            batch_space_left:int=batch_size-int(self.epsilon*batch_size)
+        else:
+            batch_space_left:int=batch_size
 
         if batch_space_left>0:
             batch.extend(random.sample(population[int(self.epsilon*batch_size):],batch_space_left))
@@ -93,10 +98,22 @@ class Block:
         self.batch=self.choice(self.population,self.batch_size)
         #print("The best neuron Q: ",self.batch[0].Qvalue())
 
+    def moveToBestBatch(self):
+        '''
+            Save the best batch of neurons
+        '''
+        self.best_batch.clear()
+
+        self.best_batch.extend(self.batch)
+
     def Evaluate(self,evaluation:float):
         _evaluation=evaluation/self.batch_size
+
+        if _evaluation>self.best_eval:
+            self.moveToBestBatch()    
+            self.best_eval=_evaluation
         for neuron in self.batch:
-            neuron.UpdateQ(_evaluation)
+            neuron.Evaluate(_evaluation)
             if neuron.Breedable():
                 self.number_of_breedable_neurons+=1
     
@@ -126,7 +143,7 @@ class Block:
 
         # check if population is ready
 
-        population=sorted(self.population,key=lambda x:x.Q,reverse=True)
+        population=sorted(self.population,key=lambda x:x.evaluation,reverse=True)
 
         # get BEST_NEURONS% neurons sorted by thier Q value we are extracting the best neruons here
         population=population[:int(self.population_size*config.BEST_NEURONS)]
@@ -145,14 +162,11 @@ class Block:
 
         # mutate half of childrens
 
-        population=sorted(population,key=lambda x:x.Q,reverse=True)
-
         self.MutatePopulation(self.population[int(len(self.population)*(1.0-config.LEAST_NEURONS_K)):])
             
         # the rest of 20% procent population fill with brand new neurons
         for i in range(int(self.population_size*(1.0-config.BEST_NEURONS*2))):
             n=neuron.Neuron(self.input_size,self.output_size,self.init)
-            n.Q=np.random.random()*self.population[0].Q
             self.population.append(n)
 
         self.number_of_breedable_neurons=0

@@ -35,7 +35,7 @@ network1.addLayer(2,4,RecurrentLayer,[Relu,Relu],init,(8,64))
 
 evaluation_trend:TrendBuffer=TrendBuffer(20)
 
-epsilon=0.5
+epsilon=0.1
 
 trends:float=[]
 

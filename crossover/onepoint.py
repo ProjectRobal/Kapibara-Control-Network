@@ -24,6 +24,5 @@ class OnePoint(Crossover):
 
         out.input_weights=OnePoint.cross_numpy(neuron1.input_weights,neuron2.input_weights)
         out.output_weights=OnePoint.cross_numpy(neuron1.output_weights,neuron2.output_weights)
-        out.output_bias=OnePoint.cross_numpy(neuron1.output_bias,neuron1.output_bias)
 
         return out

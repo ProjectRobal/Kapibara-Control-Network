@@ -17,6 +17,5 @@ class GaussMutaion(Mutation):
 
         neuron.input_weights+=np.random.normal(0,0.01,len(neuron.input_weights))
         neuron.output_weights+=np.random.normal(0,0.01,len(neuron.output_weights))
-        neuron.output_bias+=np.random.normal(0,0.01,len(neuron.output_weights))
 
         return neuron
