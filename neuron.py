@@ -60,7 +60,6 @@ class Neuron:
         self.evaluation+=eval
 
         self.trails+=1
-        self.trails=clip(self.trails)
 
     def dump(self)->bytearray:
         '''

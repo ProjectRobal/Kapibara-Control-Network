@@ -21,9 +21,9 @@ It is based or inspired by neuroevolution algorithm such as:
 1. At every step, block picks neurons at random. Then network is evaluated. Evaluation score is evenly distributed to each block.
 Block is going to keep copy of best sub network.
 
-1. When k neurons participated in n steps, mating in block occurs, where block perform crossover and mutation on it's neuron population plus it's best sub network to keep stability in evaluation score.
+1. When k neurons participated in n steps, mating in block occurs, where block perform crossover and mutation on it's neuron population and with it's best sub network to ensure better stability in evaluation score. After mating, neurons score is reseted.
 
-1. In addition the epsilon variable is introduced. It is ratio between 0.0 to 1.0 which decide what precentage of neurons in sub population comes from best sub network. The idea is when we are satisfied with network score we can set epsilon to 1.0 and call it a day. It can be useful in real time environment.
+1. In addition the epsilon variable is introduced. It is ratio between 0.0 to 1.0 which decide what precentage of neurons in sub population comes from best sub network. The idea is when we are satisfied with network score we can set epsilon to 1.0 and call it a day. It can be useful in real time environment. 
 
 
 ## File description:

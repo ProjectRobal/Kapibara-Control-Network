@@ -19,9 +19,9 @@ import time
 
 class Block:
     def __init__(self,input_size:int,output_size:int,batch_size:int,population_size:int,strategy:BreedStrategy=BreedStrategy()) -> None:
-        self.population_size=population_size
+        self.population_size=population_size+batch_size
 
-        # population size should even for crossover function
+        # population size should be even for crossover function
         if self.population_size%2 != 0:
             self.population_size+=1
 
@@ -112,6 +112,7 @@ class Block:
         if _evaluation>self.best_eval:
             self.moveToBestBatch()    
             self.best_eval=_evaluation
+        
         for neuron in self.batch:
             neuron.Evaluate(_evaluation)
             if neuron.Breedable():
@@ -140,13 +141,12 @@ class Block:
             couple of least peroforming neruons give random weights
 
         '''
+        population=[]
+        population.extend(self.best_batch)
 
-        # check if population is ready
+        # get BEST_NEURONS% neurons sorted by thier evaluation value we are extracting the best neruons here
 
-        population=sorted(self.population,key=lambda x:x.evaluation,reverse=True)
-
-        # get BEST_NEURONS% neurons sorted by thier Q value we are extracting the best neruons here
-        population=population[:int(self.population_size*config.BEST_NEURONS)]
+        population.extend(sorted(self.population,key=lambda x:x.evaluation,reverse=True)[:int(self.population_size*config.BEST_NEURONS)])
 
         #print("Best neuron Q value : ",population[0].Q)
 
@@ -164,7 +164,7 @@ class Block:
 
         self.MutatePopulation(self.population[int(len(self.population)*(1.0-config.LEAST_NEURONS_K)):])
             
-        # the rest of 20% procent population fill with brand new neurons
+        # the rest of remaning  population size is filled with brand new neurons
         for i in range(int(self.population_size*(1.0-config.BEST_NEURONS*2))):
             n=neuron.Neuron(self.input_size,self.output_size,self.init)
             self.population.append(n)

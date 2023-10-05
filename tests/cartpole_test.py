@@ -35,7 +35,7 @@ network1.addLayer(2,4,RecurrentLayer,[Relu,Relu],init,(8,64))
 
 evaluation_trend:TrendBuffer=TrendBuffer(20)
 
-epsilon=0.1
+epsilon=0.0
 
 trends:float=[]
 
@@ -126,16 +126,10 @@ while True:
 
     steps_list.clear()
 
-    #print("Episode: ",episode, "finished with average ",evaluation," steps")
-
     rewards.append(evaluation)
 
     network1.evalute(evaluation)
-    #print("Reward: ",evaluation)
-    #print("Epsilon: ",network1.layers[0].blocks[0].epsilon)
-
-    #if steps > best_score:
-    #    best_score=steps
+    
     NetworkParser.save(network1,"tests/checkpoint/last.pk")
 
     episode+=1
