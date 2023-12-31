@@ -12,8 +12,8 @@ class OnePoint(Crossover):
     def cross_numpy(x1:np.array,x2:np.array)->np.array:
         output=np.ndarray(len(x1),np.float32)
 
-        output[0:int(len(x1)/2)]=x2[0:int(len(x1)/2)]
-        output[(int(len(x1)/2)):len(x1)]=x1[(int(len(x1)/2)):len(x1)]
+        output[0:int(len(x1)/2)]=x2[(int(len(x1)/2)):len(x1)]
+        output[(int(len(x1)/2)):len(x1)]=x1[0:int(len(x1)/2)]
 
         return output
         

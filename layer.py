@@ -60,7 +60,7 @@ class Layer:
 
         for block in self.blocks:
             block.pickBatch()
-            outputs+=block.fire(_inputs)#/len(self.blocks)
+            outputs+=block.fire(_inputs)/len(self.blocks)
 
         for n,activ in enumerate(self.activation_fun):
             outputs[n]=clip(activ(outputs[n]))
@@ -72,7 +72,7 @@ class Layer:
 
         for block in self.blocks:
             #block.pickBatch()
-            outputs+=block.fire(_inputs)#/len(self.blocks)
+            outputs+=block.fire(_inputs)/len(self.blocks)
 
         for n,activ in enumerate(self.activation_fun):
             outputs[n]=clip(activ(outputs[n]))
@@ -155,7 +155,7 @@ class RecurrentLayer(Layer):
         inputs=np.concatenate((_inputs,self.last_outputs))
 
         for block in self.blocks:
-            outputs+=block.fire(inputs)#/len(self.blocks)
+            outputs+=block.fire(inputs)/len(self.blocks)
 
         for n,activ in enumerate(self.activation_fun):
             outputs[n]=clip(activ(outputs[n]))
@@ -171,7 +171,7 @@ class RecurrentLayer(Layer):
 
         for block in self.blocks:
             block.pickBatch()
-            outputs+=block.fire(inputs)#/len(self.blocks)
+            outputs+=block.fire(inputs)/len(self.blocks)
 
         for n,activ in enumerate(self.activation_fun):
             outputs[n]=clip(activ(outputs[n]))

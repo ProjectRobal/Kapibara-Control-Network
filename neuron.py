@@ -57,7 +57,7 @@ class Neuron:
         return self.trails==config.NUMBER_OF_TRIALS
     
     def Evaluate(self,eval:float):
-        self.evaluation+=eval
+        self.evaluation=eval+config.LEARING_RATE*self.evaluation
 
         self.trails+=1
 

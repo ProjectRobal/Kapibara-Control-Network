@@ -13,13 +13,14 @@ import more_itertools as mit
 
 import config
 
-from util import clip
+from util import clip,read_time_s
 import time
+
 
 
 class Block:
     def __init__(self,input_size:int,output_size:int,batch_size:int,population_size:int,strategy:BreedStrategy=BreedStrategy()) -> None:
-        self.population_size=population_size+batch_size
+        self.population_size=population_size
 
         # population size should be even for crossover function
         if self.population_size%2 != 0:
@@ -48,6 +49,8 @@ class Block:
 
         self.init:Initializer=UniformInit()
 
+        self.stall_timer:int=read_time_s()
+
     def setInitializer(self,init:Initializer):
         self.init=init
 
@@ -70,6 +73,15 @@ class Block:
 
     def clearPopulation(self):
         self.population.clear()
+
+    def regenPopulation(self):
+        self.clearPopulation()
+
+        for i in range(int(self.population_size/(2*self.batch_size))):
+            self.population.extend(self.best_batch)
+
+        for i in range(int(self.population_size-len(self.population))):
+            self.population.append(neuron.Neuron(self.input_size,self.output_size,self.init))
 
     def PopulationSize(self)->int:
         return len(self.population)
@@ -109,9 +121,23 @@ class Block:
     def Evaluate(self,evaluation:float):
         _evaluation=evaluation/self.batch_size
 
+
+        if self.epsilon>=1.0:
+            '''
+                We don't need to reset block when we are in minimum that satisfy us.
+            '''
+            self.stall_timer=read_time_s()
+
         if _evaluation>self.best_eval:
+            #print("Best current evaluation: ",_evaluation)
             self.moveToBestBatch()    
             self.best_eval=_evaluation
+            self.stall_timer=read_time_s()
+
+        if read_time_s()-self.stall_timer>=config.STALL_TIME:
+            print("Block stalled! Creating new population!")
+            self.regenPopulation()
+            self.stall_timer=read_time_s()
         
         for neuron in self.batch:
             neuron.Evaluate(_evaluation)
@@ -142,13 +168,14 @@ class Block:
 
         '''
         population=[]
-        population.extend(self.best_batch)
 
         # get BEST_NEURONS% neurons sorted by thier evaluation value we are extracting the best neruons here
 
-        population.extend(sorted(self.population,key=lambda x:x.evaluation,reverse=True)[:int(self.population_size*config.BEST_NEURONS)])
+        population.extend(sorted(self.population,key=lambda x:x.evaluation/config.NUMBER_OF_TRIALS,reverse=True)[:int(self.population_size*config.BEST_NEURONS)])
+        population=population[:-self.batch_size]
 
-        #print("Best neuron Q value : ",population[0].Q)
+        #for b_n in self.best_batch:
+        #    population.insert(int(np.random.random()*(len(population)-1)),b_n)
 
         print("Breeding ",time.strftime("%H:%M:%S"))
 

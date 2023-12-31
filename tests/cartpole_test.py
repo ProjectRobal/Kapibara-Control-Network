@@ -1,13 +1,3 @@
-'''
-Notes:
-
-Instead of using equation Q(t)=Q(t-1)+alfa*R(t) use 
-Q(t)=Q(t-1)+alfa*d(R(t)/Q(t-1))*R(t)
-
-Where d is function that is near 0 when (Q(t) / Q(t-1)) is less than 1.0.
-
-'''
-
 import os
 import numpy as np
 import gymnasium
@@ -27,11 +17,11 @@ import matplotlib.pyplot as pyplot
 
 env=gymnasium.make("CartPole-v1",render_mode="human")
 
-init=GaussInit(0,0.1)
+init=GaussInit(0,1.0)
 
-network1=Network(2)
+network1=Network(4)
 
-network1.addLayer(2,4,RecurrentLayer,[Relu,Relu],init,(8,64))
+network1.addLayer(2,4,Layer,[Relu,Relu],init,(8,64))
 
 evaluation_trend:TrendBuffer=TrendBuffer(20)
 
@@ -51,30 +41,23 @@ def trendfunction(eval:float,network:Network)->float:
 
     evaluation_trend.push(eval)
 
-    #_epsilon=np.exp(2.3*(eval/500))*0.1
-
-    _epsilon=eval/500
-
     if eval>best_eval:
         best_eval=eval
-        print("Best current evaluation: ",best_eval)
+        print("New best score: ",best_eval)
+
+    #_epsilon=np.exp(2.3*(eval/500))*0.1
+
+    _epsilon=eval/2000
 
     if _epsilon>epsilon:
-        print("New epsilon:",_epsilon)
         epsilon=_epsilon
  
     return epsilon
 
-
-def state_to_reward(observation:np.ndarray):
-    p=observation[0]
-    theta=observation[2]
-    return  - (p**2)/11.52 - (theta**2)/288
-
 if os.path.exists("tests/checkpoint/last.pk"):
     print("Loading checkpoint!!")
     #It doesn't load for some reason
-    #network1=NetworkParser.load("tests/checkpoint/last.pk")
+    network1=NetworkParser.load("tests/checkpoint/last.pk")
 
 network1.setTrendFunction(trendfunction)
 
@@ -103,32 +86,37 @@ while True:
 
     steps_list:list[float]=[]
 
-    network1.shuttle()
+    #network1.shuttle()
 
     for i in range(1):
 
         steps=0
 
+        network1.shuttle()
+
         while not terminated:
-            output=network1.run([state[0],state[2]])
+            output=network1.run(state)
             action:int=np.argmax(output)
 
             state,reward,terminated,truncated,info=env.step(action)
 
             steps+=1
 
+            if steps>2000:
+                terminated=True
+
         terminated=False
         (state,_)=env.reset()
         
+        #network1.evalute(steps)
         steps_list.append(steps)
+        network1.evalute(steps)
 
     evaluation=np.mean(steps_list)
 
     steps_list.clear()
 
     rewards.append(evaluation)
-
-    network1.evalute(evaluation)
     
     NetworkParser.save(network1,"tests/checkpoint/last.pk")
 
